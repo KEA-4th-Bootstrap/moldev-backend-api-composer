@@ -1,4 +1,4 @@
-package org.bootstrap.apicomposer.global.security;
+package org.bootstrap.apicomposer.global.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
