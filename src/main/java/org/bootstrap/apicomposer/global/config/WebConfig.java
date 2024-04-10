@@ -13,9 +13,8 @@ public class WebConfig implements WebFluxConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
 
         registry.addMapping("/api/**")
-                .allowedOrigins("https://domain2.com")
-                .allowedMethods("PUT", "DELETE")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "PATCH", "DELETE")
                 .allowCredentials(true).maxAge(3600);
-
     }
 }
