@@ -31,19 +31,12 @@ public class WebClientUtil {
                 .bodyToMono(responseType)
                 .onErrorResume(e -> {
                     // 에러 처리 로직
-                    // 예를 들어, 에러 로그를 출력하고, 에러에 대한 정보를 담은 Mono를 반환
                     log.error("Error calling external API: {}", e.getMessage(), e);
-                    // 적절한 에러 처리를 위해 Mono.empty() 반환 또는 에러 정보를 담은 Mono 반환
                     return Mono.empty();
                 });
     }
 
     public <T> Mono<T> api(String uri, Class<T> responseType, HttpMethod httpMethod, Object requestBody, HttpHeaders headers) {
-        log.info("httpMethod: {}", httpMethod);
-        log.info("uri: {}", uri);
-        log.info("requestBody: {}", requestBody);
-        log.info("headers: {}", headers);
-
         return webClientConfig.webClient()
                 .method(httpMethod)
                 .uri(uri)
@@ -53,9 +46,7 @@ public class WebClientUtil {
                 .bodyToMono(responseType)
                 .onErrorResume(e -> {
                     // 에러 처리 로직
-                    // 예를 들어, 에러 로그를 출력하고, 에러에 대한 정보를 담은 Mono를 반환
                     log.error("Error calling external API: {}", e.getMessage(), e);
-                    // 적절한 에러 처리를 위해 Mono.empty() 반환 또는 에러 정보를 담은 Mono 반환
                     return Mono.empty();
                 });
     }
