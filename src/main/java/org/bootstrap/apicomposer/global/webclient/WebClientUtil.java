@@ -1,11 +1,15 @@
 package org.bootstrap.apicomposer.global.webclient;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WebClientUtil {
 
     private final WebClientConfig webClientConfig;
@@ -18,29 +22,41 @@ public class WebClientUtil {
                 .bodyToMono(responseType);
     }
 
-    public <T> Mono<T> post(String url, Object requestBody, Class<T> responseType) {
+    public <T> Mono<T> api(String uri, Class<T> responseType, HttpMethod httpMethod, HttpHeaders headers) {
         return webClientConfig.webClient()
-                .post()
-                .uri(url)
-                .bodyValue(requestBody)
+                .method(httpMethod)
+                .uri(uri)
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
                 .retrieve()
-                .bodyToMono(responseType);
+                .bodyToMono(responseType)
+                .onErrorResume(e -> {
+                    // 에러 처리 로직
+                    // 예를 들어, 에러 로그를 출력하고, 에러에 대한 정보를 담은 Mono를 반환
+                    log.error("Error calling external API: {}", e.getMessage(), e);
+                    // 적절한 에러 처리를 위해 Mono.empty() 반환 또는 에러 정보를 담은 Mono 반환
+                    return Mono.empty();
+                });
     }
 
-    public <T> Mono<T> patch(String url, Object requestBody, Class<T> responseType) {
-        return webClientConfig.webClient()
-                .patch()
-                .uri(url)
-                .bodyValue(requestBody)
-                .retrieve()
-                .bodyToMono(responseType);
-    }
+    public <T> Mono<T> api(String uri, Class<T> responseType, HttpMethod httpMethod, Object requestBody, HttpHeaders headers) {
+        log.info("httpMethod: {}", httpMethod);
+        log.info("uri: {}", uri);
+        log.info("requestBody: {}", requestBody);
+        log.info("headers: {}", headers);
 
-    public <T> Mono<T> delete(String url, Class<T> responseType) {
         return webClientConfig.webClient()
-                .delete()
-                .uri(url)
+                .method(httpMethod)
+                .uri(uri)
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .body(Mono.just(requestBody), requestBody.getClass())
                 .retrieve()
-                .bodyToMono(responseType);
+                .bodyToMono(responseType)
+                .onErrorResume(e -> {
+                    // 에러 처리 로직
+                    // 예를 들어, 에러 로그를 출력하고, 에러에 대한 정보를 담은 Mono를 반환
+                    log.error("Error calling external API: {}", e.getMessage(), e);
+                    // 적절한 에러 처리를 위해 Mono.empty() 반환 또는 에러 정보를 담은 Mono 반환
+                    return Mono.empty();
+                });
     }
 }
