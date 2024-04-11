@@ -105,7 +105,7 @@ public class JwtProvider {
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
-        return new UsernamePasswordAuthenticationToken(claims.get("userId"), "", authorities);
+        return new UsernamePasswordAuthenticationToken(claims.getSubject(), "", authorities);
     }
 
     private Claims getClaimsFormToken(String token) {
