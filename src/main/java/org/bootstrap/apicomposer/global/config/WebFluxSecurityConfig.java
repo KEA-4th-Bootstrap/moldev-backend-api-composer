@@ -48,11 +48,12 @@ public class WebFluxSecurityConfig {
         return exchange -> {
             String token = jwtProvider.resolveToken(exchange.getRequest());
             try {
-                if(!Objects.isNull(token) && jwtProvider.validateAccessToken(token)){
-                    Authentication authentication = jwtProvider.getAuthentication(token);
-                    exchange.getAttributes().put(USER_ID_KEY, authentication.getPrincipal());
-                    return Mono.justOrEmpty(authentication);
+                if(Objects.isNull(token) || !jwtProvider.validateAccessToken(token)){
+                    throw new UnAuthenticationException("Invalid Token");
                 }
+                Authentication authentication = jwtProvider.getAuthentication(token);
+                exchange.getAttributes().put(USER_ID_KEY, authentication.getPrincipal());
+                return Mono.justOrEmpty(authentication);
             } catch (UnAuthenticationException e) {
                 log.error(e.getMessage(), e);
             }
