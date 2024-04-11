@@ -28,13 +28,13 @@ public class RequestRoutingWebFilter implements WebFilter {
 
         if (HttpMethod.GET.equals(requestMethod)) {
             return chain.filter(exchange);
-        } else {
-            String host = requestPath.split("/")[2] + ":8081";
-            String newUri = createUri(host, requestPath, requestUri.getQuery());
-
-            return webClientUtil.api(newUri, byte[].class, requestMethod, request.getBody(), request.getHeaders())
-                    .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body))));
         }
+
+        String host = requestPath.split("/")[2] + ":8081";
+        String newUri = createUri(host, requestPath, requestUri.getQuery());
+
+        return webClientUtil.api(newUri, byte[].class, requestMethod, request.getBody(), request.getHeaders())
+                .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body))));
     }
 
     private String createUri(String host, String path, String query) {
