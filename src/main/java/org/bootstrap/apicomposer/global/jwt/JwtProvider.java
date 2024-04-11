@@ -1,7 +1,5 @@
 package org.bootstrap.apicomposer.global.jwt;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.*;
 import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +15,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -38,6 +35,7 @@ public class JwtProvider {
     @Value("${jwt.refresh-expiration-hours}")
     private long refreshExpirationHours;
 
+    public static final String USER_ROLE_KEY = "userRole";
     public static final String ACCESS_TOKEN = "Access_Token";
     public static final String REFRESH_TOKEN = "Refresh_Token";
 
@@ -46,7 +44,7 @@ public class JwtProvider {
         return Jwts.builder()
                 .signWith(new SecretKeySpec(secretKey.getBytes(), SignatureAlgorithm.HS512.getJcaName()))   // HS512 알고리즘을 사용하여 secretKey를 이용해 서명
                 .setSubject(String.valueOf(userId))  // JWT 토큰 제목
-                .claim("adminYn", "ROLE_USER")   // 클레임 설정
+                .claim(USER_ROLE_KEY, "ROLE_USER")   // 클레임 설정
                 .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))    // JWT 토큰 발급 시간
                 .setExpiration(Date.from(Instant.now().plus(accessExpirationHours, ChronoUnit.HOURS)))    // JWT 토큰 만료 시간
                 .compact(); // JWT 토큰 생성
@@ -96,12 +94,12 @@ public class JwtProvider {
     public Authentication getAuthentication(String accessToken) throws UnAuthenticationException{
         Claims claims = getClaimsFormToken(accessToken);
 
-        if(claims.get("adminYn") == null){
+        if(claims.get(USER_ROLE_KEY) == null){
             throw new UnAuthenticationException("Token without permission information");
         }
 
         Collection<? extends GrantedAuthority> authorities = Arrays
-                .stream(claims.get("adminYn").toString().split(","))
+                .stream(claims.get(USER_ROLE_KEY).toString().split(","))
                 .map(SimpleGrantedAuthority::new)
                 .toList();
 
