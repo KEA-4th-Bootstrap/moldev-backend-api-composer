@@ -14,14 +14,6 @@ public class WebClientUtil {
 
     private final WebClientConfig webClientConfig;
 
-    public <T> Mono<T> get(String url, Class<T> responseType) {
-        return webClientConfig.webClient()
-                .get()
-                .uri(url)
-                .retrieve()
-                .bodyToMono(responseType);
-    }
-
     public <T> Mono<T> api(String uri, Class<T> responseType, HttpMethod httpMethod, HttpHeaders headers) {
         return webClientConfig.webClient()
                 .method(httpMethod)
