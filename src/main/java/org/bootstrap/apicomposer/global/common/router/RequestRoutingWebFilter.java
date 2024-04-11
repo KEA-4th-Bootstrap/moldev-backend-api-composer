@@ -24,25 +24,20 @@ public class RequestRoutingWebFilter implements WebFilter {
         ServerHttpRequest request = exchange.getRequest();
         HttpMethod requestMethod = request.getMethod();
         URI requestUri = request.getURI();
+        String requestPath = requestUri.getPath();
 
         if (HttpMethod.GET.equals(requestMethod)) {
             return chain.filter(exchange);
         } else {
-            String baseUrl = "http://localhost:8080";
-            String requestPath = requestUri.getPath();
-            if (requestPath.contains("test1")) {
-                baseUrl = "http://localhost:8081";
-            } else if (requestPath.contains("test2")) {
-                baseUrl = "http://localhost:8082";
-            }
+            String host = requestPath.split("/")[2] + ":8081";
+            String newUri = createUri(host, requestPath, requestUri.getQuery());
 
-            URI newUri = URI.create(baseUrl + requestPath + (requestUri.getQuery() != null ? "?" + requestUri.getQuery() : ""));
-
-            return webClientUtil.api(newUri.toString(), byte[].class, requestMethod, request.getBody(), request.getHeaders())
-                    .flatMap(body -> {
-                        log.info("response: {}", body);
-                        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body)));
-                    });
+            return webClientUtil.api(newUri, byte[].class, requestMethod, request.getBody(), request.getHeaders())
+                    .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body))));
         }
+    }
+
+    private String createUri(String host, String path, String query) {
+        return "http://" + host + path + (query != null ? "?" + query : "");
     }
 }
