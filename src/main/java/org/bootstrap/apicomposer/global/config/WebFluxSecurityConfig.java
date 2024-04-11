@@ -8,17 +8,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.MapReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.preauth.x509.SubjectDnX509PrincipalExtractor;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -30,6 +30,7 @@ import java.util.Objects;
 public class WebFluxSecurityConfig {
 
     private final JwtProvider jwtProvider;
+    public static final String USER_ID_KEY = "userId";
 
     private AuthenticationWebFilter authenticationWebFilter() {
         ReactiveAuthenticationManager authenticationManager = Mono::just;
@@ -45,7 +46,9 @@ public class WebFluxSecurityConfig {
             String token = jwtProvider.resolveToken(exchange.getRequest());
             try {
                 if(!Objects.isNull(token) && jwtProvider.validateAccessToken(token)){
-                    return Mono.justOrEmpty(jwtProvider.getAuthentication(token));
+                    Authentication authentication = jwtProvider.getAuthentication(token);
+                    exchange.getAttributes().put(USER_ID_KEY, authentication.getPrincipal());
+                    return Mono.justOrEmpty(authentication);
                 }
             } catch (UnAuthenticationException e) {
                 log.error(e.getMessage(), e);
