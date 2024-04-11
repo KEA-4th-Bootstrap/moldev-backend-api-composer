@@ -2,8 +2,10 @@ package org.bootstrap.apicomposer.global.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bootstrap.apicomposer.global.common.router.RequestRoutingWebFilter;
 import org.bootstrap.apicomposer.global.exception.custom.UnAuthenticationException;
 import org.bootstrap.apicomposer.global.jwt.JwtProvider;
+import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -30,6 +32,7 @@ import java.util.Objects;
 public class WebFluxSecurityConfig {
 
     private final JwtProvider jwtProvider;
+    private final WebClientUtil webClientUtil;
     public static final String USER_ID_KEY = "userId";
 
     private AuthenticationWebFilter authenticationWebFilter() {
@@ -60,14 +63,17 @@ public class WebFluxSecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges ->
                         exchanges
                                 .pathMatchers("/api/test").authenticated()
+                                .pathMatchers("/api/test1/post").authenticated()
                                 .anyExchange().permitAll()
                 )
                 .addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
-                .httpBasic(Customizer.withDefaults())
-        ;
+                .addFilterAfter(new RequestRoutingWebFilter(webClientUtil), SecurityWebFiltersOrder.AUTHORIZATION)
+                .httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 
