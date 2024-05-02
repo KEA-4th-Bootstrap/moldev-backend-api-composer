@@ -38,16 +38,16 @@ public class RequestRoutingWebFilter implements WebFilter {
         }
 
         MediaType contentType = headers.getContentType();
-        String newUri = createUri(requestPath);
-        log.info("routing to: {}", newUri);
+        String newUrl = createUrl(requestPath);
+        log.info("routing to: {}", newUrl);
 
         if (MediaType.APPLICATION_JSON.isCompatibleWith(contentType)) {
-            return webClientUtil.api(newUri, byte[].class, requestMethod, request.getBody(), headers)
+            return webClientUtil.api(newUrl, byte[].class, requestMethod, request.getBody(), headers)
                     .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body))));
         } else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(contentType)) {
             // Multipart 요청 처리
             return exchange.getMultipartData()
-                    .flatMap(parts -> webClientUtil.apiMultipart(requestMethod, newUri, parts, headers))
+                    .flatMap(parts -> webClientUtil.apiMultipart(requestMethod, newUrl, parts, headers))
                     .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body))));
         } else {
             // 지원하지 않는 컨텐트 타입에 대한 처리
@@ -55,8 +55,8 @@ public class RequestRoutingWebFilter implements WebFilter {
         }
     }
 
-    private String createUri(String path) {
-        String host = path.split("/")[2];
-        return "http://" + host + "-service.default.svc.cluster.local:80" + path;
+    private String createUrl(String path) {
+        String domain = path.split("/")[2];
+        return String.format("http://%s-service.default.svc.cluster.local:80%s", domain, path);
     }
 }
