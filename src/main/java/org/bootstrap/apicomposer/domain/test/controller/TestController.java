@@ -2,6 +2,7 @@ package org.bootstrap.apicomposer.domain.test.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bootstrap.apicomposer.domain.test.dto.res.TokenResponse;
 import org.bootstrap.apicomposer.domain.test.service.TestService;
 import org.bootstrap.apicomposer.global.common.auth.UserId;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -21,23 +22,23 @@ public class TestController {
     private final TestService testService;
 
     @GetMapping
-    public Mono<String> test(
+    public Mono<byte[]> test(
             @UserId Long userId,
             ServerHttpRequest request
             ) {
         log.info("userId: {}", userId);
-        return Mono.just(testService.webClientTest(request.getHeaders()));
+        return testService.webClientTest(request.getHeaders());
     }
 
     @GetMapping("/free")
-    public Mono<String> noAuthTest(
+    public Mono<byte[]> noAuthTest(
             ServerHttpRequest request
     ) {
-        return Mono.just(testService.webClientTest(request.getHeaders()));
+        return testService.webClientTest(request.getHeaders());
     }
 
     @GetMapping("/login")
-    public Mono<String> testLogin(
+    public Mono<TokenResponse> testLogin(
             @RequestParam String email,
             @RequestParam String password
     ) {
