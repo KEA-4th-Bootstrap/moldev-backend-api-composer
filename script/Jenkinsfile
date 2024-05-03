@@ -78,7 +78,7 @@ pipeline {
                     string(credentialsId: 'docker-file-api-composer', variable: 'DOCKER_FILE')
                 ]) {
                     sh """
-                        cd composer
+                        cd api-composer
                         sed -i 's/${DOCKER_NAME}\\/${DOCKER_FILE}:.*\$/${DOCKER_NAME}\\/${DOCKER_FILE}:${currentBuild.number}/g' deployment.yaml
                         git add deployment.yaml
                         git commit -m '[UPDATE] manifest ${currentBuild.number} image versioning'
