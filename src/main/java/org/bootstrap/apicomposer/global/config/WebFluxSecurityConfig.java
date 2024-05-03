@@ -8,6 +8,7 @@ import org.bootstrap.apicomposer.global.jwt.JwtProvider;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
@@ -33,7 +34,6 @@ public class WebFluxSecurityConfig {
 
     private final JwtProvider jwtProvider;
     private final WebClientUtil webClientUtil;
-    public static final String USER_ID_KEY = "userId";
 
     private AuthenticationWebFilter authenticationWebFilter() {
         ReactiveAuthenticationManager authenticationManager = Mono::just;
@@ -52,10 +52,10 @@ public class WebFluxSecurityConfig {
                     throw new UnAuthenticationException("Invalid Token");
                 }
                 Authentication authentication = jwtProvider.getAuthentication(token);
-                exchange.getAttributes().put(USER_ID_KEY, authentication.getPrincipal());
+                exchange.getAttributes().put(HttpHeaders.AUTHORIZATION, authentication.getPrincipal());
                 return Mono.justOrEmpty(authentication);
             } catch (UnAuthenticationException e) {
-                log.error(e.getMessage(), e);
+                log.error(e.getMessage());
             }
             return Mono.empty();
         };
@@ -67,8 +67,6 @@ public class WebFluxSecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges ->
                         exchanges
-                                .pathMatchers("/api/test").authenticated()
-                                .pathMatchers("/api/test1/post").authenticated()
                                 .anyExchange().permitAll()
                 )
                 .addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)

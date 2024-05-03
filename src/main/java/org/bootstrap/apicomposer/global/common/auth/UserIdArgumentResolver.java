@@ -2,6 +2,7 @@ package org.bootstrap.apicomposer.global.common.auth;
 
 import jakarta.annotation.Nonnull;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.BindingContext;
 import org.springframework.web.reactive.result.method.HandlerMethodArgumentResolver;
 import org.springframework.web.server.ServerWebExchange;
@@ -18,7 +19,7 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Mono<Object> resolveArgument(@Nonnull MethodParameter parameter, @Nonnull BindingContext bindingContext, @Nonnull ServerWebExchange exchange) {
-        String userId = exchange.getAttribute("userId");
+        String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
         return userId != null ? Mono.just(Long.valueOf(userId)) : Mono.empty();
     }
 }
