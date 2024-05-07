@@ -2,6 +2,8 @@ package org.bootstrap.apicomposer.global.webclient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,9 +13,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Component
 @RequiredArgsConstructor
@@ -21,50 +25,58 @@ import java.util.List;
 public class WebClientUtil {
 
     private final WebClientConfig webClientConfig;
-
-    public <T> Mono<T> api(String uri, Class<T> responseType, HttpMethod httpMethod, HttpHeaders headers) {
+    
+    private WebClient.RequestBodySpec baseAPI(String uri, HttpMethod httpMethod, HttpHeaders headers){
         return webClientConfig.webClient()
                 .method(httpMethod)
                 .uri(uri)
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .retrieve()
-                .bodyToMono(responseType)
-                .onErrorResume(e -> {
-                    // 에러 처리 로직
-                    log.error("Error calling external API: {}", e.getMessage(), e);
-                    return Mono.empty();
-                });
-    }
+                .headers(httpHeaders -> httpHeaders.addAll(headers));
+    };
 
-    public <T> Mono<T> api(String uri, Class<T> responseType, HttpMethod httpMethod, Object requestBody, HttpHeaders headers) {
-        return webClientConfig.webClient()
-                .method(httpMethod)
-                .uri(uri)
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .body(Mono.just(requestBody), requestBody.getClass())
-                .retrieve()
-                .bodyToMono(responseType)
-                .onErrorResume(e -> {
-                    // 에러 처리 로직
-                    log.error("Error calling external API: {}", e.getMessage(), e);
-                    return Mono.empty();
-                });
-    }
-
-    public Mono<byte[]> apiMultipart(HttpMethod httpMethod, String uri, MultiValueMap<String, Part> parts, HttpHeaders headers) {
-        // WebClient를 사용하여 멀티파트 요청을 설정
-        return webClientConfig.webClient()
-                .method(httpMethod)
-                .uri(uri)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .headers(httpHeaders -> httpHeaders.addAll(headers))
-                .body(BodyInserters.fromMultipartData(parts))
-                .retrieve() // 서버로부터의 응답을 가져옴
+    private static Mono<byte[]> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers){
+        return request.retrieve()
                 .bodyToMono(byte[].class)
                 .onErrorResume(e -> {
                     // 에러 처리 로직
-                    log.error("Error calling external API: {}", e.getMessage(), e);
+                    log.error("""
+                                    Error calling external API: {}
+                                    RequestHeaders: {}
+                                    """, e.getMessage(), headers);
+
                     return Mono.empty();
                 });
+    }
+
+    private static Mono<byte[]> apiRetrieve(WebClient.RequestHeadersSpec<?> requestHeadersSpec, HttpHeaders headers){
+        return requestHeadersSpec.retrieve()
+                .bodyToMono(byte[].class)
+                .onErrorResume(e -> {
+                    // 에러 처리 로직
+                    log.error("""
+                                    Error calling external API: {}
+                                    RequestHeaders: {}
+                                    """, e.getMessage(), headers);
+
+                    return Mono.empty();
+                });
+    }
+
+    public Mono<byte[]> api(String uri, HttpMethod httpMethod, HttpHeaders headers) {
+        return apiRetrieve(baseAPI(uri, httpMethod, headers), headers);
+    }
+
+    public Mono<byte[]> api(String uri, HttpMethod httpMethod, Publisher<DataBuffer> requestBody, HttpHeaders headers) {
+        return apiRetrieve(baseAPI(uri, httpMethod, headers).body(BodyInserters.fromDataBuffers(requestBody)), headers);
+    }
+
+    public Mono<byte[]> api(String uri, HttpMethod httpMethod, Object requestBody, HttpHeaders headers) {
+        return apiRetrieve(baseAPI(uri, httpMethod, headers).bodyValue(requestBody), headers);
+    }
+
+    public Mono<byte[]> api(HttpMethod httpMethod, String uri, MultiValueMap<String, Part> parts, HttpHeaders headers) {
+        // WebClient를 사용하여 멀티파트 요청을 설정
+        return apiRetrieve(baseAPI(uri, httpMethod, headers)
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(parts)), headers);
     }
 }
