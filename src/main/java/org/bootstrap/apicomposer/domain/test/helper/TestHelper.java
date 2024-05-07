@@ -13,7 +13,7 @@ public class TestHelper {
 
     private final WebClientUtil webClientUtil;
 
-    public <T> Mono<T> testGetMethod(String url, Class<T> responseType, HttpHeaders headers) {
-        return webClientUtil.api(url, responseType, HttpMethod.GET, headers);
+    public Mono<byte[]> testGetMethod(String url, HttpHeaders headers) {
+        return webClientUtil.api(url, HttpMethod.GET, headers);
     }
 }
