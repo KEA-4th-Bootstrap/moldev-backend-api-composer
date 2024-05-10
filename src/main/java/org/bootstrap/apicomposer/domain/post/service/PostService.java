@@ -27,9 +27,7 @@ public class PostService {
                     .map(SearchPostVo::memberId)
                     .collect(Collectors.toList());
             Mono<UserDetailResponseDto> searchUserVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
-            return searchUserVoMono.map(nextResult -> {
-                return SearchPostsResponseDto.of(result, nextResult);
-            });
+            return searchUserVoMono.map(nextResult -> SearchPostsResponseDto.of(result, nextResult));
         });
     }
 }
