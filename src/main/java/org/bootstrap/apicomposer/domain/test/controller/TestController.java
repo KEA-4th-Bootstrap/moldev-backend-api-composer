@@ -3,6 +3,7 @@ package org.bootstrap.apicomposer.domain.test.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bootstrap.apicomposer.domain.test.dto.req.PostRequestDto;
+import org.bootstrap.apicomposer.domain.test.dto.res.GetResponseDto;
 import org.bootstrap.apicomposer.domain.test.dto.res.TokenResponse;
 import org.bootstrap.apicomposer.domain.test.service.TestService;
 import org.bootstrap.apicomposer.global.common.auth.UserId;
@@ -20,7 +21,7 @@ public class TestController {
     private final TestService testService;
 
     @GetMapping
-    public Mono<byte[]> test(
+    public Mono<GetResponseDto> test(
             @UserId Long userId,
             ServerHttpRequest request
             ) {
@@ -29,7 +30,7 @@ public class TestController {
     }
 
     @GetMapping("/free")
-    public Mono<byte[]> noAuthTest(
+    public Mono<GetResponseDto> noAuthTest(
             ServerHttpRequest request
     ) {
         return testService.webClientTest(request.getHeaders());

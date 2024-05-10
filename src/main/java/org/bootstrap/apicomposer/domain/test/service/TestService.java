@@ -3,6 +3,8 @@ package org.bootstrap.apicomposer.domain.test.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bootstrap.apicomposer.domain.test.dto.req.PostRequestDto;
+import org.bootstrap.apicomposer.domain.test.dto.res.GetResponseDto;
+import org.bootstrap.apicomposer.domain.test.dto.res.PostResponseDto;
 import org.bootstrap.apicomposer.domain.test.dto.res.TokenResponse;
 import org.bootstrap.apicomposer.domain.test.helper.TestHelper;
 import org.bootstrap.apicomposer.global.jwt.JwtProvider;
@@ -13,7 +15,9 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple3;
 
+import java.util.Arrays;
 import java.util.concurrent.Flow;
 
 @Service
@@ -25,17 +29,18 @@ public class TestService {
     private final JwtProvider jwtProvider;
     private final WebClientUtil webClientUtil;
 
-    public Mono<byte[]> webClientTest(HttpHeaders request) {
-        Mono<byte[]> stringMono = testHelper.testGetMethod("https://www.google.com", request);
-        stringMono.subscribe(value -> log.info("value: {}", value));
+    public Mono<GetResponseDto> webClientTest(HttpHeaders request) {
+        Mono<String> stringMono = testHelper.testGetMethod(request);
+        Mono<String> stringMono2 = testHelper.testGetMethod(request);
+        Mono<String> stringMono3 = testHelper.testGetMethod(request);
 
-        return stringMono;
+        return Mono.zip(stringMono, stringMono2, stringMono3).flatMap(tuple ->
+            Mono.just(GetResponseDto.of(tuple.getT1(), tuple.getT2(), tuple.getT3()))
+        );
     }
 
-    public Mono<byte[]> webClientTestForPost(HttpHeaders request, Long id) {
-        return testHelper.testGetMethod("http://post-service.default.svc.cluster.local:80/api/post/" + id, request)
-                .doOnNext(value -> log.info("value: {}", value))
-                .onErrorResume(e -> Mono.just(("Error occurred: " + e.getMessage()).getBytes()));
+    public Mono<PostResponseDto> webClientTestForPost(HttpHeaders request, Long id) {
+        return testHelper.testGetPostMethod("http://post-service.default.svc.cluster.local:80/api/post/" + id, request);
     }
 
     public Mono<byte[]> testPost(PostRequestDto request, HttpHeaders headers) {
