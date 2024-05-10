@@ -33,6 +33,20 @@ public class WebClientUtil {
                 .headers(httpHeaders -> httpHeaders.addAll(headers));
     };
 
+    private static <T> Mono<T> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers, Class<T> responseClass){
+        return request.retrieve()
+                .bodyToMono(responseClass)
+                .onErrorResume(e -> {
+                    // 에러 처리 로직
+                    log.error("""
+                                    Error calling external API: {}
+                                    RequestHeaders: {}
+                                    """, e.getMessage(), headers);
+
+                    return Mono.empty();
+                });
+    }
+
     private static Mono<byte[]> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers){
         return request.retrieve()
                 .bodyToMono(byte[].class)
@@ -59,6 +73,10 @@ public class WebClientUtil {
 
                     return Mono.empty();
                 });
+    }
+
+    public <T> Mono<T> api(String uri, HttpHeaders headers, Class<T> responseClass) {
+        return apiRetrieve(baseAPI(uri, HttpMethod.GET, headers), headers, responseClass);
     }
 
     public Mono<byte[]> api(String uri, HttpMethod httpMethod, HttpHeaders headers) {
