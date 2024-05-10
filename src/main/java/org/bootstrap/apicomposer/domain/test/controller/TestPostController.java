@@ -1,6 +1,7 @@
 package org.bootstrap.apicomposer.domain.test.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.bootstrap.apicomposer.domain.test.dto.res.PostResponseDto;
 import org.bootstrap.apicomposer.domain.test.service.TestService;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +18,7 @@ public class TestPostController {
     private final TestService testService;
 
     @GetMapping("/{id}")
-    public Mono<byte[]> postDomainTest(
+    public Mono<PostResponseDto> postDomainTest(
             ServerHttpRequest request,
             @PathVariable Long id
     ) {
