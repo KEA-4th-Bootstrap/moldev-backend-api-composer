@@ -1,13 +1,11 @@
 package org.bootstrap.apicomposer.domain.post.contoller;
 
 import lombok.RequiredArgsConstructor;
+import org.bootstrap.apicomposer.domain.post.dto.response.PostDetailInfoResponseDto;
 import org.bootstrap.apicomposer.domain.post.dto.response.SearchPostsResponseDto;
 import org.bootstrap.apicomposer.domain.post.service.PostService;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
@@ -20,5 +18,12 @@ public class PostController {
     public Mono<SearchPostsResponseDto> getSearchPosts(@RequestParam final String text,
                                                        ServerHttpRequest request) {
         return postService.getSearchPosts(text, request);
+    }
+
+    @GetMapping("/{id}")
+    public Mono<PostDetailInfoResponseDto> getPostInfo(@PathVariable("id") final Long postId,
+                                                       @RequestParam final Long postWriterId,
+                                                       ServerHttpRequest request) {
+        return postService.getPostInfo(postId, postWriterId, request);
     }
 }

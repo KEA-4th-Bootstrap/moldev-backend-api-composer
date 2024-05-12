@@ -1,14 +1,15 @@
 package org.bootstrap.apicomposer.domain.post.dto.response;
 
-import lombok.Builder;
-import org.bootstrap.apicomposer.domain.post.vo.SearchPostVo;
-import org.bootstrap.apicomposer.global.common.PageInfo;
+import org.bootstrap.apicomposer.domain.post.vo.PostInfoVo;
 
-import java.util.List;
-
-@Builder
 public record PostDetailResponseDto(
-        List<SearchPostVo> postList,
-        PageInfo pageInfo
-) {
+        Long memberId,
+        Long postId,
+        String title,
+        String content,
+        String thumbnail,
+        String categoryType,
+        String lastModifiedDate,
+        Integer viewCount   //게시글 조회수
+){
 }
