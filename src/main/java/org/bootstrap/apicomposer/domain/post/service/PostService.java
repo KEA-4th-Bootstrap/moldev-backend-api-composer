@@ -33,8 +33,8 @@ public class PostService {
                                                          CategoryType type,
                                                          ServerHttpRequest request) {
         Mono<CategoryPostVo> getCategoryPost = postHelper.getCategoryPost(moldevId, request.getHeaders());
-        Mono<UserProfileVo> userProfileVo = userHelper.getUserProfileVo(moldevId, request.getHeaders());
-        return Mono.zip(getCategoryPost, userProfileVo).flatMap(tuple ->
+        Mono<UserDetailResponseDto> userDetailResponseDtoMono = userHelper.getUserProfileVo(moldevId, request.getHeaders());
+        return Mono.zip(getCategoryPost, userDetailResponseDtoMono).flatMap(tuple ->
                 Mono.just(postMapper.toPostCategoryResponseDto(tuple.getT1(), tuple.getT2()))
         );
     }

@@ -35,7 +35,7 @@ public class JwtProvider {
     @Value("${jwt.refresh-expiration-hours}")
     private long refreshExpirationHours;
 
-    public static final String USER_ROLE_KEY = "userRole";
+    public static final String USER_ROLE_KEY = "adminYn";
     public static final String TOKEN_PREFIX = "Bearer";
     public static final String ACCESS_TOKEN = "Access_Token";
     public static final String REFRESH_TOKEN = "Refresh_Token";

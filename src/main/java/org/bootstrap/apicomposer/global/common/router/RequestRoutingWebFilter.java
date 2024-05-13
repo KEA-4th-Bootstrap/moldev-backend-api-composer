@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -28,10 +29,12 @@ public class RequestRoutingWebFilter implements WebFilter {
         String requestPath = requestUri.getPath();
         String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
         HttpHeaders headers = request.getHeaders();
-        System.out.println("requestPath: " + requestPath);
+        log.info("requestPath: " + requestPath);
 
         if (userId != null) {
-            headers.add(HttpHeaders.AUTHORIZATION, userId);
+            log.info("userId: " + userId);
+            log.info("headers " + headers);
+            headers.add("id", userId);
         }
 
         if (HttpMethod.GET.equals(requestMethod)) {
