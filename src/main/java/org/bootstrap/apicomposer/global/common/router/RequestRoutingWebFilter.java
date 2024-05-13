@@ -28,6 +28,7 @@ public class RequestRoutingWebFilter implements WebFilter {
         String requestPath = requestUri.getPath();
         String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
         HttpHeaders headers = request.getHeaders();
+        System.out.println("requestPath: " + requestPath);
 
         if (userId != null) {
             headers.add(HttpHeaders.AUTHORIZATION, userId);
