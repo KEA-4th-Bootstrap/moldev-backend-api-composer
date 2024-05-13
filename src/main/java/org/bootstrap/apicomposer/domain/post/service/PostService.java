@@ -7,13 +7,11 @@ import org.bootstrap.apicomposer.domain.post.mapper.PostMapper;
 import org.bootstrap.apicomposer.domain.post.type.CategoryType;
 import org.bootstrap.apicomposer.domain.post.vo.CategoryPostVo;
 import org.bootstrap.apicomposer.domain.post.vo.SearchPostVo;
-import org.bootstrap.apicomposer.domain.reply.dto.response.CommentDetailListResponseDto;
+import org.bootstrap.apicomposer.domain.reply.dto.response.CommentCountResponseDto;
 import org.bootstrap.apicomposer.domain.reply.helper.ReplyHelper;
-import org.bootstrap.apicomposer.domain.reply.vo.PostCommentVo;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.helper.UserHelper;
-import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -51,28 +49,16 @@ public class PostService {
     }
 
     //게시글 상세조회
-    public Mono<PostDetailInfoResponseDto> getPostInfo(Long postId, Long postWriterId, ServerHttpRequest request) {
+    public Mono<PostDetailTotalResponseDto> getPostInfo(Long postId, Long postWriterId, ServerHttpRequest request) {
         //게시글 정보 불러옴
         Mono<PostDetailResponseDto> postDetailInfoMono = postHelper.getPostDetailInfoResult(postId, request.getHeaders());
         //게시글 작성자 불러옴
         Mono<UserDetailResponseDto> postWriterDetailInfoMono = userHelper.getUserDetailInfoResult(postWriterId, request.getHeaders());
-        //게시글 달린 댓글 불러옴
-        Mono<CommentDetailListResponseDto> commentsMono = replyHelper.getPostCommentResult(postId, request.getHeaders());
-        return commentsMono.flatMap(comment -> {
-            List<Long> requestMembers = comment.commentList().stream()
-                    .map(PostCommentVo::memberId)
-                    .collect(Collectors.toList());
-            // 댓글 작성자 불러옴
-            Mono<UserDetailListResponseDto> commentWriterMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
-            return Mono.zip(postDetailInfoMono, postWriterDetailInfoMono, Mono.just(comment), commentWriterMono)
-                    .map(tuple -> {
-                        PostDetailResponseDto postDetail = tuple.getT1();
-                        UserDetailResponseDto postWriterDetail = tuple.getT2();
-                        CommentDetailListResponseDto commentDetail = tuple.getT3();
-                        UserDetailListResponseDto commentWriterDetail = tuple.getT4();
-                        return PostDetailInfoResponseDto.of(postDetail, postWriterDetail, commentDetail, commentWriterDetail);
-                    });
-        });
+        //게시글 달린 댓글 개수 불러옴
+        Mono<CommentCountResponseDto> commentCountMono = replyHelper.getPostCommentCount(postId, request.getHeaders());
+        return Mono.zip(postDetailInfoMono, postWriterDetailInfoMono, commentCountMono).flatMap(tuple ->
+                Mono.just(PostDetailTotalResponseDto.of(tuple.getT1(), tuple.getT2(), tuple.getT3()))
+        );
 
     }
 
