@@ -2,7 +2,7 @@ package org.bootstrap.apicomposer.domain.post.contoller;
 
 import lombok.RequiredArgsConstructor;
 import org.bootstrap.apicomposer.domain.post.dto.response.PostCategoryResponseDto;
-import org.bootstrap.apicomposer.domain.post.dto.response.PostDetailInfoResponseDto;
+import org.bootstrap.apicomposer.domain.post.dto.response.PostDetailTotalResponseDto;
 import org.bootstrap.apicomposer.domain.post.dto.response.SearchPostsResponseDto;
 import org.bootstrap.apicomposer.domain.post.service.PostService;
 import org.bootstrap.apicomposer.domain.post.type.CategoryType;
@@ -22,10 +22,11 @@ public class PostController {
         return postService.getSearchPosts(text, request);
     }
 
+    // 게시글 상세 조회
     @GetMapping("/{id}")
-    public Mono<PostDetailInfoResponseDto> getPostInfo(@PathVariable("id") final Long postId,
-                                                       @RequestParam final Long postWriterId,
-                                                       ServerHttpRequest request) {
+    public Mono<PostDetailTotalResponseDto> getPostInfo(@PathVariable("id") final Long postId,
+                                                        @RequestParam final Long postWriterId,
+                                                        ServerHttpRequest request) {
         return postService.getPostInfo(postId, postWriterId, request);
     }
 

@@ -2,12 +2,11 @@ package org.bootstrap.apicomposer.domain.reply.vo;
 
 import java.time.LocalDateTime;
 
-public record PostCommentVo(
+public record CommentReplyVo(
         String id,
         Long memberId,
-        Long postId,
         String content,
-        Long replyCount,
+        String parentsId,
         LocalDateTime createdAt
 ) {
 }
