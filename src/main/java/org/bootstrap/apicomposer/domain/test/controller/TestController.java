@@ -7,6 +7,8 @@ import org.bootstrap.apicomposer.domain.test.dto.res.GetResponseDto;
 import org.bootstrap.apicomposer.domain.test.dto.res.TokenResponse;
 import org.bootstrap.apicomposer.domain.test.service.TestService;
 import org.bootstrap.apicomposer.global.common.auth.UserId;
+import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
+import org.bootstrap.apicomposer.global.webclient.response.SuccessCode;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +22,8 @@ public class TestController {
 
     private final TestService testService;
 
-    @GetMapping
-    public Mono<GetResponseDto> test(
+    @GetMapping("/compose")
+    public Mono<ApiResponse<?>> test(
             @UserId Long userId,
             ServerHttpRequest request
             ) {
@@ -30,7 +32,7 @@ public class TestController {
     }
 
     @GetMapping("/free")
-    public Mono<GetResponseDto> noAuthTest(
+    public Mono<ApiResponse<?>> noAuthTest(
             ServerHttpRequest request
     ) {
         return testService.webClientTest(request.getHeaders());

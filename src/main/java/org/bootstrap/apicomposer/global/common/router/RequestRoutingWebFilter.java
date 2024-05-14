@@ -1,20 +1,26 @@
 package org.bootstrap.apicomposer.global.common.router;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
+import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
+import org.bootstrap.apicomposer.global.webclient.response.SuccessCode;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,40 +33,50 @@ public class RequestRoutingWebFilter implements WebFilter {
         HttpMethod requestMethod = request.getMethod();
         URI requestUri = request.getURI();
         String requestPath = requestUri.getPath();
-        String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
-        HttpHeaders headers = request.getHeaders();
-        log.info("requestPath: " + requestPath);
+        log.info("Request path: " + requestPath);
 
-        if (userId != null) {
-            log.info("userId: " + userId);
-            log.info("headers " + headers);
-            headers.add("id", userId);
-        }
-
-        if (HttpMethod.GET.equals(requestMethod)) {
+        if (requestPath.contains("compose")) {
+            log.info("Composition request: proceed to controller");
             return chain.filter(exchange);
         }
 
+        String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
+        HttpHeaders headers = new HttpHeaders();
+        headers.addAll(request.getHeaders());
+        headers.set("Authorization", userId);
+
         MediaType contentType = headers.getContentType();
         String newUrl = createUrl(requestPath);
-        log.info("routing to: {}", newUrl);
+        log.info("Routing URL: {}", newUrl);
 
+        return handleRequest(requestMethod, request, contentType, "http://localhost:8081/api/test", headers, exchange);
+    }
+
+    private Mono<Void> handleRequest(HttpMethod method, ServerHttpRequest request, MediaType contentType, String url, HttpHeaders headers, ServerWebExchange exchange) {
         if (MediaType.APPLICATION_JSON.isCompatibleWith(contentType)) {
-            return webClientUtil.api(newUrl, requestMethod, request.getBody(), headers)
-                    .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body))));
+            return webClientUtil.api(url, method, request.getBody(), headers)
+                    .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)));
         } else if (MediaType.MULTIPART_FORM_DATA.isCompatibleWith(contentType)) {
-            // Multipart 요청 처리
             return exchange.getMultipartData()
-                    .flatMap(parts -> webClientUtil.api(requestMethod, newUrl, parts, headers))
-                    .flatMap(body -> exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(body))));
+                    .flatMap(parts -> webClientUtil.api(method, url, parts, headers))
+                    .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)));
         } else {
-            // 지원하지 않는 컨텐트 타입에 대한 처리
             return Mono.error(new UnsupportedOperationException("Unsupported content type: " + contentType));
         }
     }
 
+    private Mono<Void> writeResponse(ServerWebExchange exchange, String data) {
+        Gson gson = new Gson();
+        JsonObject dataJson = gson.fromJson(data, JsonObject.class);
+        ApiResponse<?> finalResponse = ApiResponse.of(SuccessCode.SUCCESS, dataJson);
+        String json = gson.toJson(finalResponse);
+        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(json.getBytes())));
+    }
+
     private String createUrl(String path) {
         String domain = path.split("/")[2];
+        log.info("target: {} service", domain);
         return String.format("http://%s-service.default.svc.cluster.local:80%s", domain, path);
     }
 }
