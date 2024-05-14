@@ -9,6 +9,8 @@ import org.bootstrap.apicomposer.domain.test.dto.res.TokenResponse;
 import org.bootstrap.apicomposer.domain.test.helper.TestHelper;
 import org.bootstrap.apicomposer.global.jwt.JwtProvider;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
+import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
+import org.bootstrap.apicomposer.global.webclient.response.SuccessCode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -29,13 +31,15 @@ public class TestService {
     private final JwtProvider jwtProvider;
     private final WebClientUtil webClientUtil;
 
-    public Mono<GetResponseDto> webClientTest(HttpHeaders request) {
+    public Mono<ApiResponse<?>> webClientTest(HttpHeaders request) {
         Mono<String> stringMono = testHelper.testGetMethod(request);
         Mono<String> stringMono2 = testHelper.testGetMethod(request);
         Mono<String> stringMono3 = testHelper.testGetMethod(request);
 
         return Mono.zip(stringMono, stringMono2, stringMono3).flatMap(tuple ->
-            Mono.just(GetResponseDto.of(tuple.getT1(), tuple.getT2(), tuple.getT3()))
+            Mono.just(ApiResponse.of(
+                    SuccessCode.SUCCESS, GetResponseDto.of(tuple.getT1(), tuple.getT2(), tuple.getT3())
+            ))
         );
     }
 
