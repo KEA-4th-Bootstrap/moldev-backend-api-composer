@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 import static org.bootstrap.apicomposer.global.common.Constants.POST_SERVICE_URL;
+import static org.bootstrap.apicomposer.global.common.Constants.SEARCH_SERVICE_URL;
 
 @RequiredArgsConstructor
 @Component
@@ -17,7 +18,7 @@ public class PostHelper {
     private final WebClientUtil webClientUtil;
 
     public Mono<PostDetailListResponseDto> getSearchPostResult(String text, HttpHeaders headers) {
-        return webClientUtil.api(POST_SERVICE_URL + "/api/test", headers, PostDetailListResponseDto.class);
+        return webClientUtil.api(SEARCH_SERVICE_URL + "/api/search", headers, PostDetailListResponseDto.class);
     }
 
     public Mono<PostDetailResponseDto> getPostDetailInfoResult(Long postId, HttpHeaders headers) {
