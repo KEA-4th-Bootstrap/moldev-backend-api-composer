@@ -127,7 +127,7 @@ pipeline {
 
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'kakao-jenkins-token', passwordVariable: 'USER_KEY', usernameVariable: 'PASSWORD_KEY')]) {
+                withCredentials([usernamePassword(credentialsId: 'kakao-jenkins-token', passwordVariable: 'PASSWORD_KEY', usernameVariable: 'USER_KEY')]) {
                     sh "docker login gcu-bootstrap-dev.kr-central-2.kcr.dev --username ${USER_KEY} --password ${PASSWORD_KEY}"
                 }
             }
@@ -136,10 +136,13 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'api-compose-source-image', variable: 'IMAGE'),
-                    string(credentialsId: 'api-compose-image-name', variable: 'IMAGE_NAME')
+//                     string(credentialsId: 'api-compose-source-image', variable: 'IMAGE'),
+//                     string(credentialsId: 'api-compose-image-name', variable: 'IMAGE_NAME'),
+                    string(credentialsId: 'docker-hub-name', variable: 'DOCKER_NAME'),
+                    string(credentialsId: 'docker-file-api-composer', variable: 'DOCKER_FILE')
                 ]) {
-                    sh "docker tag ${IMAGE} gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/${IMAGE_NAME}:${currentBuild.number}"
+                    sh "docker build -t ${DOCKER_NAME}/${DOCKER_FILE}:${currentBuild.number} ."
+                    sh "docker tag ${DOCKER_NAME}/${DOCKER_FILE}:${currentBuild.number} gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/${DOCKER_FILE}:${currentBuild.number}"
                 }
             }
 
@@ -148,10 +151,11 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 withCredentials([
-                    string(credentialsId: 'api-compose-source-image', variable: 'IMAGE'),
-                    string(credentialsId: 'api-compose-image-name', variable: 'IMAGE_NAME')
+//                     string(credentialsId: 'api-compose-source-image', variable: 'IMAGE'),
+//                     string(credentialsId: 'api-compose-image-name', variable: 'IMAGE_NAME')
+                    string(credentialsId: 'docker-file-api-composer', variable: 'DOCKER_FILE')
                 ]) {
-                    sh "docker push gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/${IMAGE_NAME}:${currentBuild.number}"
+                    sh "docker push gcu-bootstrap-dev.kr-central-2.kcr.dev/moldev-repository/${DOCKER_FILE}:${currentBuild.number}"
                 }
             }
         }
