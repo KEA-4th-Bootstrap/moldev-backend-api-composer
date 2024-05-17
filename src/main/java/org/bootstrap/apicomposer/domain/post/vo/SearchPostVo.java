@@ -1,7 +1,6 @@
 package org.bootstrap.apicomposer.domain.post.vo;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import org.bootstrap.apicomposer.global.utils.MemberIdField;
 
 public record SearchPostVo(
         Long memberId,
@@ -11,10 +10,10 @@ public record SearchPostVo(
         String thumbnail,
         String categoryType,
         String lastModifiedDate
-) {
-    public static List<Long> getRequestMembers(List<SearchPostVo> postList) {
-        return postList.stream()
-                .map(SearchPostVo::memberId)
-                .collect(Collectors.toList());
+) implements MemberIdField {
+
+    @Override
+    public Long getMemberId() {
+        return this.memberId;
     }
 }

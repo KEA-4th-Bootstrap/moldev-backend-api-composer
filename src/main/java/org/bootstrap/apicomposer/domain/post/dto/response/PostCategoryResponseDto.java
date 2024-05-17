@@ -3,7 +3,6 @@ package org.bootstrap.apicomposer.domain.post.dto.response;
 import lombok.AccessLevel;
 import lombok.Builder;
 import org.bootstrap.apicomposer.domain.post.vo.CategoryPostVo;
-import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
 
 @Builder(access = AccessLevel.PRIVATE)

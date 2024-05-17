@@ -6,8 +6,6 @@ import org.bootstrap.apicomposer.domain.reply.dto.response.CommentTotalResponseD
 import org.bootstrap.apicomposer.domain.reply.dto.response.ReplyDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.reply.dto.response.ReplyTotalResponseDto;
 import org.bootstrap.apicomposer.domain.reply.helper.ReplyHelper;
-import org.bootstrap.apicomposer.domain.reply.vo.CommentReplyVo;
-import org.bootstrap.apicomposer.domain.reply.vo.PostCommentVo;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.user.helper.UserHelper;
 import org.bootstrap.apicomposer.global.common.SuccessResponse;
@@ -18,6 +16,8 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+import static org.bootstrap.apicomposer.global.utils.MemberIdUtils.getMemberIds;
+
 @RequiredArgsConstructor
 @Service
 public class ReplyService {
@@ -27,7 +27,7 @@ public class ReplyService {
     public Mono<ResponseEntity<SuccessResponse<?>>> getCommentList(Long postId, ServerHttpRequest request) {
         Mono<ResponseEntity<CommentDetailListResponseDto>> commentListMono = replyHelper.getPostCommentResult(postId, request.getHeaders());
         return commentListMono.flatMap(result -> {
-            List<Long> requestMembers = PostCommentVo.getRequestMemberId(result.getBody().commentList());
+            List<Long> requestMembers = getMemberIds(result.getBody().commentList());
             Mono<ResponseEntity<UserDetailListResponseDto>> userVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
             return userVoMono.map(nextResult -> {
                 CommentTotalResponseDto responseDto = CommentTotalResponseDto.of(result.getBody(), nextResult.getBody());
@@ -39,7 +39,7 @@ public class ReplyService {
     public Mono<ResponseEntity<SuccessResponse<?>>> getReplyList(String parentsId, ServerHttpRequest request) {
         Mono<ResponseEntity<ReplyDetailListResponseDto>> replyListMono = replyHelper.getCommentReplyResult(parentsId, request.getHeaders());
         return replyListMono.flatMap(result -> {
-            List<Long> requestMembers = CommentReplyVo.getRequestMemberId(result.getBody().replyList());
+            List<Long> requestMembers = getMemberIds(result.getBody().replyList());
             Mono<ResponseEntity<UserDetailListResponseDto>> userVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
             return userVoMono.map(nextResult -> {
                 ReplyTotalResponseDto responseDto = ReplyTotalResponseDto.of(result.getBody(), nextResult.getBody());

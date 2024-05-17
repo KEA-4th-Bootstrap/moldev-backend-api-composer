@@ -1,8 +1,8 @@
 package org.bootstrap.apicomposer.domain.reply.vo;
 
+import org.bootstrap.apicomposer.global.utils.MemberIdField;
+
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public record CommentReplyVo(
         String id,
@@ -10,10 +10,10 @@ public record CommentReplyVo(
         String content,
         String parentsId,
         LocalDateTime createdAt
-) {
-    public static List<Long> getRequestMemberId(List<CommentReplyVo> responseDtoList) {
-        return responseDtoList.stream()
-                .map(responseDto -> responseDto.memberId)
-                .collect(Collectors.toList());
+) implements MemberIdField {
+
+    @Override
+    public Long getMemberId() {
+        return this.memberId;
     }
 }

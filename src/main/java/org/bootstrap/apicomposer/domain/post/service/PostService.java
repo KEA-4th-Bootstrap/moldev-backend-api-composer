@@ -6,7 +6,6 @@ import org.bootstrap.apicomposer.domain.post.dto.response.*;
 import org.bootstrap.apicomposer.domain.post.helper.PostHelper;
 import org.bootstrap.apicomposer.domain.post.type.CategoryType;
 import org.bootstrap.apicomposer.domain.post.vo.CategoryPostVo;
-import org.bootstrap.apicomposer.domain.post.vo.SearchPostVo;
 import org.bootstrap.apicomposer.domain.reply.dto.response.CommentCountResponseDto;
 import org.bootstrap.apicomposer.domain.reply.helper.ReplyHelper;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
@@ -20,6 +19,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+
+import static org.bootstrap.apicomposer.global.utils.MemberIdUtils.getMemberIds;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class PostService {
                                                                    ServerHttpRequest request) {
         Mono<ResponseEntity<PostDetailListResponseDto>> searchPostVoMono = postHelper.getSearchPostResult(text, request.getHeaders());
         return searchPostVoMono.flatMap(result -> {
-            List<Long> requestMembers = SearchPostVo.getRequestMembers(result.getBody().postList());
+            List<Long> requestMembers = getMemberIds(result.getBody().postList());
             Mono<ResponseEntity<UserDetailListResponseDto>> searchUserVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
             return searchUserVoMono.map(nextResult -> {
                 SearchPostsResponseDto responseDto = SearchPostsResponseDto.of(result.getBody(), nextResult.getBody());
