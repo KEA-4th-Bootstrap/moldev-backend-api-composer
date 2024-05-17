@@ -4,7 +4,9 @@ import lombok.Builder;
 
 @Builder
 public record UserProfileVo(
-        String name,
-        String profile
+        String profileImgUrl,
+        String moldevId,
+        String nickname,
+        String islandName
 ) {
 }
