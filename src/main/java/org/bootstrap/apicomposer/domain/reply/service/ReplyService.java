@@ -10,39 +10,41 @@ import org.bootstrap.apicomposer.domain.reply.vo.CommentReplyVo;
 import org.bootstrap.apicomposer.domain.reply.vo.PostCommentVo;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.user.helper.UserHelper;
+import org.bootstrap.apicomposer.global.common.SuccessResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class ReplyService {
-
     private final ReplyHelper replyHelper;
     private final UserHelper userHelper;
 
-    public Mono<CommentTotalResponseDto> getCommentList(Long postId, ServerHttpRequest request) {
-        Mono<CommentDetailListResponseDto> commentListMono = replyHelper.getPostCommentResult(postId, request.getHeaders());
+    public Mono<ResponseEntity<SuccessResponse<?>>> getCommentList(Long postId, ServerHttpRequest request) {
+        Mono<ResponseEntity<CommentDetailListResponseDto>> commentListMono = replyHelper.getPostCommentResult(postId, request.getHeaders());
         return commentListMono.flatMap(result -> {
-            List<Long> requestMembers = result.commentList().stream()
-                    .map(PostCommentVo::memberId)
-                    .collect(Collectors.toList());
-            Mono<UserDetailListResponseDto> userVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
-            return userVoMono.map(nextResult -> CommentTotalResponseDto.of(result, nextResult));
+            List<Long> requestMembers = PostCommentVo.getRequestMemberId(result.getBody().commentList());
+            Mono<ResponseEntity<UserDetailListResponseDto>> userVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
+            return userVoMono.map(nextResult -> {
+                CommentTotalResponseDto responseDto = CommentTotalResponseDto.of(result.getBody(), nextResult.getBody());
+                return SuccessResponse.ok(responseDto);
+            });
         });
     }
 
-    public Mono<ReplyTotalResponseDto> getReplyList(String parentsId, ServerHttpRequest request) {
-        Mono<ReplyDetailListResponseDto> replyListMono = replyHelper.getCommentReplyResult(parentsId, request.getHeaders());
+    public Mono<ResponseEntity<SuccessResponse<?>>> getReplyList(String parentsId, ServerHttpRequest request) {
+        Mono<ResponseEntity<ReplyDetailListResponseDto>> replyListMono = replyHelper.getCommentReplyResult(parentsId, request.getHeaders());
         return replyListMono.flatMap(result -> {
-            List<Long> requestMembers = result.replyList().stream()
-                    .map(CommentReplyVo::memberId)
-                    .collect(Collectors.toList());
-            Mono<UserDetailListResponseDto> userVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
-            return userVoMono.map(nextResult -> ReplyTotalResponseDto.of(result, nextResult));
+            List<Long> requestMembers = CommentReplyVo.getRequestMemberId(result.getBody().replyList());
+            Mono<ResponseEntity<UserDetailListResponseDto>> userVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
+            return userVoMono.map(nextResult -> {
+                ReplyTotalResponseDto responseDto = ReplyTotalResponseDto.of(result.getBody(), nextResult.getBody());
+                return SuccessResponse.ok(responseDto);
+            });
         });
     }
 }

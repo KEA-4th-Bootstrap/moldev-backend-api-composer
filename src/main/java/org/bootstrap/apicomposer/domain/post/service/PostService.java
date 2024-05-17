@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class PostService {
                                                                    ServerHttpRequest request) {
         Mono<ResponseEntity<PostDetailListResponseDto>> searchPostVoMono = postHelper.getSearchPostResult(text, request.getHeaders());
         return searchPostVoMono.flatMap(result -> {
-            List<Long> requestMembers = getRequestMembers(result.getBody().postList());
+            List<Long> requestMembers = SearchPostVo.getRequestMembers(result.getBody().postList());
             Mono<ResponseEntity<UserDetailListResponseDto>> searchUserVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
             return searchUserVoMono.map(nextResult -> {
                 SearchPostsResponseDto responseDto = SearchPostsResponseDto.of(result.getBody(), nextResult.getBody());
@@ -62,11 +61,5 @@ public class PostService {
             PostDetailTotalResponseDto responseDto = PostDetailTotalResponseDto.of(tuple.getT1().getBody(), tuple.getT2().getBody(), tuple.getT3().getBody());
             return Mono.just(SuccessResponse.ok(responseDto));
         });
-    }
-
-    private List<Long> getRequestMembers(List<SearchPostVo> postList) {
-        return postList.stream()
-                .map(SearchPostVo::memberId)
-                .collect(Collectors.toList());
     }
 }
