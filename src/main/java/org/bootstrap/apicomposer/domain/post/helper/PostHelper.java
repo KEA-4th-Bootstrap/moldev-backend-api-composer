@@ -3,10 +3,13 @@ package org.bootstrap.apicomposer.domain.post.helper;
 import lombok.RequiredArgsConstructor;
 import org.bootstrap.apicomposer.domain.post.dto.response.PostDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.post.dto.response.PostDetailResponseDto;
+import org.bootstrap.apicomposer.domain.post.type.CategoryType;
 import org.bootstrap.apicomposer.domain.post.vo.CategoryPostVo;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import static org.bootstrap.apicomposer.global.common.Constants.POST_SERVICE_URL;
@@ -17,15 +20,21 @@ import static org.bootstrap.apicomposer.global.common.Constants.SEARCH_SERVICE_U
 public class PostHelper {
     private final WebClientUtil webClientUtil;
 
-    public Mono<PostDetailListResponseDto> getSearchPostResult(String text, HttpHeaders headers) {
+    public Mono<ResponseEntity<PostDetailListResponseDto>> getSearchPostResult(String text, HttpHeaders headers) {
         return webClientUtil.api(SEARCH_SERVICE_URL + "/api/search", headers, PostDetailListResponseDto.class);
     }
 
-    public Mono<PostDetailResponseDto> getPostDetailInfoResult(Long postId, HttpHeaders headers) {
+    public Mono<ResponseEntity<PostDetailResponseDto>> getPostDetailInfoResult(Long postId, HttpHeaders headers) {
         return webClientUtil.api(POST_SERVICE_URL + "/api/post/" + postId, headers, PostDetailResponseDto.class);
     }
 
-    public Mono<CategoryPostVo> getCategoryPost(String moldevId, HttpHeaders headers) {
-        return webClientUtil.api(POST_SERVICE_URL + "/api/compose/" + moldevId + "/post", headers, CategoryPostVo.class);
+    public Mono<ResponseEntity<CategoryPostVo>> getCategoryPost(String moldevId, CategoryType type, HttpHeaders headers) {
+        return webClientUtil.api(
+                UriComponentsBuilder.fromHttpUrl(POST_SERVICE_URL + "/api/compose/post/" + moldevId + "/category")
+                        .queryParam("type", type)
+                        .toUriString(),
+                headers,
+                CategoryPostVo.class
+        );
     }
 }
