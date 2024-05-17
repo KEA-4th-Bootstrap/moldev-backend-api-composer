@@ -7,6 +7,7 @@ import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
@@ -20,58 +21,50 @@ import reactor.core.publisher.Mono;
 public class WebClientUtil {
 
     private final WebClientConfig webClientConfig;
-    
-    private WebClient.RequestBodySpec baseAPI(String uri, HttpMethod httpMethod, HttpHeaders headers){
+
+    private WebClient.RequestBodySpec baseAPI(String uri, HttpMethod httpMethod, HttpHeaders headers) {
         return webClientConfig.webClient()
                 .method(httpMethod)
                 .uri(uri)
                 .headers(httpHeaders -> httpHeaders.addAll(headers));
-    };
-
-    private static <T> Mono<T> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers, Class<T> responseClass){
-        return request.retrieve()
-                .bodyToMono(responseClass)
-                .onErrorResume(e -> {
-                    // 에러 처리 로직
-                    log.error("""
-                                    Error calling external API: {}
-                                    RequestHeaders: {}
-                                    """, e.getMessage(), headers);
-
-                    return Mono.empty();
-                });
     }
 
-    private static Mono<byte[]> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers){
+    private static <T> Mono<ResponseEntity<T>> apiRetrieve(WebClient.RequestBodySpec request, Class<T> responseClass) {
+        return request.retrieve()
+                .toEntity(responseClass);
+    }
+
+    private static Mono<byte[]> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers) {
         return request.retrieve()
                 .bodyToMono(byte[].class)
                 .onErrorResume(e -> {
                     // 에러 처리 로직
                     log.error("""
-                                    Error calling external API: {}
-                                    RequestHeaders: {}
-                                    """, e.getMessage(), headers);
+                            Error calling external API: {}
+                            RequestHeaders: {}
+                            """, e.getMessage(), headers);
 
                     return Mono.empty();
                 });
     }
 
-    private static Mono<byte[]> apiRetrieve(WebClient.RequestHeadersSpec<?> requestHeadersSpec, HttpHeaders headers){
+    private static Mono<byte[]> apiRetrieve(WebClient.RequestHeadersSpec<?> requestHeadersSpec, HttpHeaders headers) {
         return requestHeadersSpec.retrieve()
                 .bodyToMono(byte[].class)
                 .onErrorResume(e -> {
                     // 에러 처리 로직
                     log.error("""
-                                    Error calling external API: {}
-                                    RequestHeaders: {}
-                                    """, e.getMessage(), headers);
+                            Error calling external API: {}
+                            RequestHeaders: {}
+                            """, e.getMessage(), headers);
 
                     return Mono.empty();
                 });
     }
 
-    public <T> Mono<T> api(String uri, HttpHeaders headers, Class<T> responseClass) {
-        return apiRetrieve(baseAPI(uri, HttpMethod.GET, headers), headers, responseClass);
+    public <T> Mono<ResponseEntity<T>> api(String uri, HttpHeaders headers, Class<T> responseClass) {
+        WebClient.RequestBodySpec requestBodySpec = baseAPI(uri, HttpMethod.GET, headers);
+        return apiRetrieve(requestBodySpec, responseClass);
     }
 
     public Mono<byte[]> api(String uri, HttpMethod httpMethod, HttpHeaders headers) {
