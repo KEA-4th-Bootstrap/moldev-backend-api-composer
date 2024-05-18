@@ -12,8 +12,8 @@ import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponse
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.helper.UserHelper;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
-import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
-import org.bootstrap.apicomposer.global.webclient.response.SuccessCode;
+import org.bootstrap.apicomposer.global.common.response.ApiResponse;
+import org.bootstrap.apicomposer.global.common.response.SuccessCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;

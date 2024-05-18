@@ -8,8 +8,8 @@ import org.bootstrap.apicomposer.domain.reply.dto.response.ReplyTotalResponseDto
 import org.bootstrap.apicomposer.domain.reply.helper.ReplyHelper;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.user.helper.UserHelper;
-import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
-import org.bootstrap.apicomposer.global.webclient.response.SuccessCode;
+import org.bootstrap.apicomposer.global.common.response.ApiResponse;
+import org.bootstrap.apicomposer.global.common.response.SuccessCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;

@@ -1,4 +1,4 @@
-package org.bootstrap.apicomposer.global.webclient.response;
+package org.bootstrap.apicomposer.global.common.response;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
