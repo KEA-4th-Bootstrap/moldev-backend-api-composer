@@ -4,6 +4,7 @@ package org.bootstrap.apicomposer.domain.reply.controller;
 import lombok.RequiredArgsConstructor;
 import org.bootstrap.apicomposer.domain.reply.service.ReplyService;
 import org.bootstrap.apicomposer.global.common.SuccessResponse;
+import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,13 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<SuccessResponse<?>>> getCommentList(@PathVariable("id") final Long postId,
-                                                                   ServerHttpRequest request) {
+    public Mono<ApiResponse<?>> getCommentList(@PathVariable("id") final Long postId,
+                                               ServerHttpRequest request) {
         return replyService.getCommentList(postId, request);
     }
 
     @GetMapping("")
-    public Mono<ResponseEntity<SuccessResponse<?>>> getCommentList(@RequestParam final String parentsId,
+    public Mono<ApiResponse<?>> getCommentList(@RequestParam final String parentsId,
                                                       ServerHttpRequest request) {
         return replyService.getReplyList(parentsId, request);
     }

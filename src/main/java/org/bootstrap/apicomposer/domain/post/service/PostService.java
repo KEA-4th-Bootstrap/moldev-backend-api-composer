@@ -12,7 +12,8 @@ import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponse
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.helper.UserHelper;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
-import org.bootstrap.apicomposer.global.common.SuccessResponse;
+import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
+import org.bootstrap.apicomposer.global.webclient.response.SuccessCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
@@ -30,37 +31,37 @@ public class PostService {
     private final UserHelper userHelper;
     private final ReplyHelper replyHelper;
 
-    public Mono<ResponseEntity<SuccessResponse<?>>> getCategoryPost(String moldevId,
-                                                                    CategoryType type,
-                                                                    ServerHttpRequest request) {
+    public Mono<ApiResponse<?>> getCategoryPost(String moldevId,
+                                                CategoryType type,
+                                                ServerHttpRequest request) {
         Mono<ResponseEntity<CategoryPostVo>> getCategoryPost = postHelper.getCategoryPost(moldevId, type, request.getHeaders());
         Mono<ResponseEntity<UserProfileVo>> userDetailResponseDtoMono = userHelper.getUserProfileVo(moldevId, request.getHeaders());
         return Mono.zip(getCategoryPost, userDetailResponseDtoMono).flatMap(tuple -> {
             PostCategoryResponseDto responseDto = PostCategoryResponseDto.of(tuple.getT1().getBody(), tuple.getT2().getBody());
-            return Mono.just(SuccessResponse.ok(responseDto));
+            return Mono.just(ApiResponse.of(SuccessCode.SUCCESS, responseDto));
         });
     }
 
-    public Mono<ResponseEntity<SuccessResponse<?>>> getSearchPosts(String text,
-                                                                   ServerHttpRequest request) {
+    public Mono<ApiResponse<?>> getSearchPosts(String text,
+                                               ServerHttpRequest request) {
         Mono<ResponseEntity<PostDetailListResponseDto>> searchPostVoMono = postHelper.getSearchPostResult(text, request.getHeaders());
         return searchPostVoMono.flatMap(result -> {
             List<Long> requestMembers = getMemberIds(result.getBody().postList());
             Mono<ResponseEntity<UserDetailListResponseDto>> searchUserVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
             return searchUserVoMono.map(nextResult -> {
                 SearchPostsResponseDto responseDto = SearchPostsResponseDto.of(result.getBody(), nextResult.getBody());
-                return SuccessResponse.ok(responseDto);
+                return ApiResponse.of(SuccessCode.SUCCESS, responseDto);
             });
         });
     }
 
-    public Mono<ResponseEntity<SuccessResponse<?>>> getPostInfo(Long postId, Long postWriterId, ServerHttpRequest request) {
+    public Mono<ApiResponse<?>> getPostInfo(Long postId, Long postWriterId, ServerHttpRequest request) {
         Mono<ResponseEntity<PostDetailResponseDto>> postDetailInfoMono = postHelper.getPostDetailInfoResult(postId, request.getHeaders());
         Mono<ResponseEntity<UserDetailResponseDto>> postWriterDetailInfoMono = userHelper.getUserDetailInfoResult(postWriterId, request.getHeaders());
         Mono<ResponseEntity<CommentCountResponseDto>> commentCountMono = replyHelper.getPostCommentCount(postId, request.getHeaders());
         return Mono.zip(postDetailInfoMono, postWriterDetailInfoMono, commentCountMono).flatMap(tuple -> {
             PostDetailTotalResponseDto responseDto = PostDetailTotalResponseDto.of(tuple.getT1().getBody(), tuple.getT2().getBody(), tuple.getT3().getBody());
-            return Mono.just(SuccessResponse.ok(responseDto));
+            return Mono.just(ApiResponse.of(SuccessCode.SUCCESS, responseDto));
         });
     }
 }
