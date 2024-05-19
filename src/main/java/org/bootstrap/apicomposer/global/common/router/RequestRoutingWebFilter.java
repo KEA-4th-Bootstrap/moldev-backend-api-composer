@@ -6,9 +6,8 @@ import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
-import org.bootstrap.apicomposer.global.webclient.response.ApiResponse;
-import org.bootstrap.apicomposer.global.webclient.response.SuccessCode;
-import org.springframework.core.io.buffer.DataBuffer;
+import org.bootstrap.apicomposer.global.common.response.ApiResponse;
+import org.bootstrap.apicomposer.global.common.response.SuccessCode;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -20,7 +19,6 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -1,4 +1,4 @@
-package org.bootstrap.apicomposer.global.webclient.response;
+package org.bootstrap.apicomposer.global.common.response;
 
 public interface ResponseCode {
 
