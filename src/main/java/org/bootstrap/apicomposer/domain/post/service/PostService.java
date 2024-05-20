@@ -42,9 +42,9 @@ public class PostService {
         });
     }
 
-    public Mono<ApiResponse<?>> getSearchPosts(String text,
+    public Mono<ApiResponse<?>> getSearchPosts(String title,
                                                ServerHttpRequest request) {
-        Mono<ResponseEntity<PostDetailListResponseDto>> searchPostVoMono = postHelper.getSearchPostResult(text, request.getHeaders());
+        Mono<ResponseEntity<PostDetailListResponseDto>> searchPostVoMono = postHelper.getSearchPostResult(title, request.getHeaders());
         return searchPostVoMono.flatMap(result -> {
             List<Long> requestMembers = getMemberIds(result.getBody().postList());
             Mono<ResponseEntity<UserDetailListResponseDto>> searchUserVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
