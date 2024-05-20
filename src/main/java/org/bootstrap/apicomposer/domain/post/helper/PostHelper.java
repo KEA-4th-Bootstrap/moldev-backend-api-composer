@@ -25,11 +25,12 @@ public class PostHelper {
                 UriComponentsBuilder.fromHttpUrl(SEARCH_SERVICE_URL + "/api/search/posts")
                         .queryParam("title", text)
                         .toUriString(),
-                headers, PostDetailListResponseDto.class);
+                headers,
+                PostDetailListResponseDto.class);
     }
 
     public Mono<ResponseEntity<PostDetailResponseDto>> getPostDetailInfoResult(Long postId, HttpHeaders headers) {
-        return webClientUtil.api(POST_SERVICE_URL + "/api/post/" + postId, headers, PostDetailResponseDto.class);
+        return webClientUtil.api(POST_SERVICE_URL + "/api/post/" + postId + "/detail", headers, PostDetailResponseDto.class);
     }
 
     public Mono<ResponseEntity<CategoryPostVo>> getCategoryPost(String moldevId, CategoryType type, HttpHeaders headers) {
