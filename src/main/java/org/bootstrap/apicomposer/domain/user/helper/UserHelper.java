@@ -22,7 +22,7 @@ public class UserHelper {
 
     public Mono<ResponseEntity<UserDetailListResponseDto>> getSearchUserResult(List<Long> userIds, HttpHeaders headers) {
         return webClientUtil.api(
-                UriComponentsBuilder.fromHttpUrl(MEMBER_SERVICE_URL + "/api/members/info")
+                UriComponentsBuilder.fromHttpUrl(MEMBER_SERVICE_URL + "/api/member/info")
                         .queryParam("ids", userIds)
                         .toUriString(),
                 headers,
@@ -30,13 +30,13 @@ public class UserHelper {
     }
 
     public Mono<ResponseEntity<UserDetailResponseDto>> getUserDetailInfoResult(Long userId, HttpHeaders headers) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/members/" +userId,
+        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/" +userId,
                 headers,
                 UserDetailResponseDto.class);
     }
 
     public Mono<ResponseEntity<UserProfileVo>> getUserProfileVo(String moldevId, HttpHeaders headers) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/members/" + moldevId + "/profile",
+        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/" + moldevId + "/profile",
                 headers,
                 UserProfileVo.class);
     }
