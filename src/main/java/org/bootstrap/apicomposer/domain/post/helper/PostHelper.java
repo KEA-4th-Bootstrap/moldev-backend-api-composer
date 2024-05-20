@@ -34,7 +34,7 @@ public class PostHelper {
 
     public Mono<ResponseEntity<CategoryPostVo>> getCategoryPost(String moldevId, CategoryType type, HttpHeaders headers) {
         return webClientUtil.api(
-                UriComponentsBuilder.fromHttpUrl(POST_SERVICE_URL + "/api/compose/post/" + moldevId + "/category")
+                UriComponentsBuilder.fromHttpUrl(POST_SERVICE_URL + "/api/post/" + moldevId + "/category")
                         .queryParam("type", type)
                         .toUriString(),
                 headers,
