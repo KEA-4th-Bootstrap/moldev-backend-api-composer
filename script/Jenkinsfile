@@ -11,13 +11,18 @@ pipeline {
         stage('Build') {
             steps {
                 withCredentials([file(credentialsId: 'api-composer', variable: 'application')]) {
-                    sh """
+                    withCredentials([file(credentialsId: 'build-script', variable: 'BUILD_SCRIPT')]) {
+                        sh """
                             mkdir -p ./src/main/resources
                             cp -f ${application} ./src/main/resources/application.yml
-                            ls -l src/main/resources/
-                            cat src/main/resources/application.yml
+                            cp -f ${BUILD_SCRIPT} ./build.sh
+                            chmod +x ./build.sh
+                            ls -l ./src/main/resources/
+                            ls -l ./
+                            cat ./src/main/resources/application.yml
                             ./gradlew clean build
-                    """
+                        """
+                    }
                 }
             }
             post {
