@@ -21,7 +21,11 @@ public class PostHelper {
     private final WebClientUtil webClientUtil;
 
     public Mono<ResponseEntity<PostDetailListResponseDto>> getSearchPostResult(String text, HttpHeaders headers) {
-        return webClientUtil.api(SEARCH_SERVICE_URL + "/api/search", headers, PostDetailListResponseDto.class);
+        return webClientUtil.api(
+                UriComponentsBuilder.fromHttpUrl(SEARCH_SERVICE_URL + "/api/search/posts")
+                        .queryParam("title", text)
+                        .toUriString(),
+                headers, PostDetailListResponseDto.class);
     }
 
     public Mono<ResponseEntity<PostDetailResponseDto>> getPostDetailInfoResult(Long postId, HttpHeaders headers) {
