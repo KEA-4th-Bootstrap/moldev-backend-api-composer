@@ -2,7 +2,7 @@ package org.bootstrap.apicomposer.global.common;
 
 public class Constants {
     public static final String POST_SERVICE_URL = "http://post-service.backend.svc.cluster.local:8080";
-    public static final String USER_SERVICE_URL = "http://user-service.backend.svc.cluster.local:8080";
+    public static final String MEMBER_SERVICE_URL = "http://member-service.backend.svc.cluster.local:8080";
     public static final String REPLY_SERVICE_URL = "http://reply-service.backend.svc.cluster.local:8080";
     public static final String SEARCH_SERVICE_URL = "http://search-service.backend.svc.cluster.local:8080";
     public static final String AUTH_SERVICE_URL = "http://auth-service.backend.svc.cluster.local:8080";
