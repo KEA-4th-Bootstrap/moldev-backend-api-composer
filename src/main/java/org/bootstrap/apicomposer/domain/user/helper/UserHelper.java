@@ -36,7 +36,7 @@ public class UserHelper {
     }
 
     public Mono<ResponseEntity<UserProfileVo>> getUserProfileVo(String moldevId, HttpHeaders headers) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/compose/members/" + moldevId + "/profile",
+        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/members/" + moldevId + "/profile",
                 headers,
                 UserProfileVo.class);
     }
