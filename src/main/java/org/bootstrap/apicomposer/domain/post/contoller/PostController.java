@@ -33,4 +33,9 @@ public class PostController {
                                                                     ServerHttpRequest request) {
         return postService.getCategoryPost(moldevId, type, request);
     }
+
+    @GetMapping("/trend")
+    public Mono<ApiResponse<?>> getTrendPost(ServerHttpRequest request){
+        return postService.getTrendPost(request);
+    }
 }
