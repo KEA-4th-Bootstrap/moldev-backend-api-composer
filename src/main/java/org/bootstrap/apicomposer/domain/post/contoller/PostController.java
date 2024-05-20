@@ -15,9 +15,9 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping("/search")
-    public Mono<ApiResponse<?>> getSearchPosts(@RequestParam final String text,
+    public Mono<ApiResponse<?>> getSearchPosts(@RequestParam final String title,
                                                ServerHttpRequest request) {
-        return postService.getSearchPosts(text, request);
+        return postService.getSearchPosts(title, request);
     }
 
     @GetMapping("/{id}")

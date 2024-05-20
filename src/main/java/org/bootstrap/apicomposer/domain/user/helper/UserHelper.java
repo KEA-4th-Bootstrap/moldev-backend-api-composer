@@ -8,6 +8,7 @@ import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -20,13 +21,16 @@ public class UserHelper {
     private final WebClientUtil webClientUtil;
 
     public Mono<ResponseEntity<UserDetailListResponseDto>> getSearchUserResult(List<Long> userIds, HttpHeaders headers) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/test",
+        return webClientUtil.api(
+                UriComponentsBuilder.fromHttpUrl(MEMBER_SERVICE_URL + "/api/members/info")
+                        .queryParam("ids", userIds)
+                        .toUriString(),
                 headers,
                 UserDetailListResponseDto.class);
     }
 
     public Mono<ResponseEntity<UserDetailResponseDto>> getUserDetailInfoResult(Long userId, HttpHeaders headers) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/test",
+        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/members/" +userId,
                 headers,
                 UserDetailResponseDto.class);
     }
