@@ -47,7 +47,7 @@ public class RequestRoutingWebFilter implements WebFilter {
         String newUrl = createUrl(requestPath);
         log.info("Routing URL: {}", newUrl);
 
-        return handleRequest(requestMethod, request, contentType, "http://localhost:8081/api/test", headers, exchange);
+        return handleRequest(requestMethod, request, contentType, newUrl, headers, exchange);
     }
 
     private Mono<Void> handleRequest(HttpMethod method, ServerHttpRequest request, MediaType contentType, String url, HttpHeaders headers, ServerWebExchange exchange) {
