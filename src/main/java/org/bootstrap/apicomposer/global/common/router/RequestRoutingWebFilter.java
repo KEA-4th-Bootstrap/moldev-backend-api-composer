@@ -75,6 +75,6 @@ public class RequestRoutingWebFilter implements WebFilter {
     private String createUrl(String path) {
         String domain = path.split("/")[2];
         log.info("target: {} service", domain);
-        return String.format("http://%s-service.default.svc.cluster.local:80%s", domain, path);
+        return String.format("http://%s-service.backend.svc.cluster.local:80%s", domain, path);
     }
 }
