@@ -5,9 +5,9 @@ import org.bootstrap.apicomposer.global.utils.MemberIdField;
 
 public record SearchPostVo(
         Long postId,
+        Long memberId,
         String title,
         String content,
-        Long memberId,
         String thumbnail,
         CategoryType category,
         String createDate,
@@ -15,7 +15,6 @@ public record SearchPostVo(
         Long viewCount,
         String moldevId
 ) implements MemberIdField {
-
     @Override
     public Long getMemberId() {
         return this.memberId;
