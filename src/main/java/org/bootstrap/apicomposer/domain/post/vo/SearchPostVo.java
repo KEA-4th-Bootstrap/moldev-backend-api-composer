@@ -3,8 +3,6 @@ package org.bootstrap.apicomposer.domain.post.vo;
 import org.bootstrap.apicomposer.domain.post.type.CategoryType;
 import org.bootstrap.apicomposer.global.utils.MemberIdField;
 
-import java.time.LocalDateTime;
-
 public record SearchPostVo(
         Long postId,
         String title,
@@ -12,8 +10,8 @@ public record SearchPostVo(
         Long memberId,
         String thumbnail,
         CategoryType category,
-        LocalDateTime createDate,
-        LocalDateTime lastModifiedDate,
+        String createDate,
+        String lastModifiedDate,
         Long viewCount,
         String moldevId
 ) implements MemberIdField {
