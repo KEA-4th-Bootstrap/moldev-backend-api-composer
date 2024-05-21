@@ -51,7 +51,6 @@ public class PostService {
         Mono<ResponseEntity<PostDetailListResponseDto>> searchPostVoMono = postHelper.getSearchPostResult(title, request.getHeaders());
         return searchPostVoMono.flatMap(result -> {
             List<Long> requestMembers = getMemberIds(result.getBody().postList());
-            System.out.println(requestMembers.toString());
             Mono<ResponseEntity<UserDetailListResponseDto>> searchUserVoMono = userHelper.getSearchUserResult(requestMembers, request.getHeaders());
             return searchUserVoMono.map(nextResult -> {
                 SearchPostsResponseDto responseDto = SearchPostsResponseDto.of(result.getBody(), nextResult.getBody());
