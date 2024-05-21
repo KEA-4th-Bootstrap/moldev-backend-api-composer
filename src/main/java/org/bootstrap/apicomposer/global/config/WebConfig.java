@@ -15,6 +15,7 @@ public class WebConfig implements WebFluxConfigurer {
         registry.addMapping("/api/**")
                 .allowedOrigins("http://localhost:3000")
                 .allowedMethods("GET", "POST", "PATCH", "DELETE")
+                .allowedHeaders("Authorization", "Content-Type", "Access-Control-Allow-Origin")
                 .allowCredentials(true).maxAge(3600);
     }
 }
