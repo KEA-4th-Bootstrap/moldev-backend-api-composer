@@ -22,20 +22,20 @@ public class PostController {
 
     @GetMapping("/{id}")
     public Mono<ApiResponse<?>> getPostInfo(@PathVariable("id") final Long postId,
-                                                                @RequestParam final Long postWriterId,
-                                                                ServerHttpRequest request) {
+                                            @RequestParam final Long postWriterId,
+                                            ServerHttpRequest request) {
         return postService.getPostInfo(postId, postWriterId, request);
     }
 
     @GetMapping("/{moldevId}/category")
     public Mono<ApiResponse<?>> getCategoryPost(@PathVariable final String moldevId,
-                                                                    @RequestParam final CategoryType type,
-                                                                    ServerHttpRequest request) {
+                                                @RequestParam final CategoryType type,
+                                                ServerHttpRequest request) {
         return postService.getCategoryPost(moldevId, type, request);
     }
 
     @GetMapping("/trend")
-    public Mono<ApiResponse<?>> getTrendPost(ServerHttpRequest request){
+    public Mono<ApiResponse<?>> getTrendPost(ServerHttpRequest request) {
         return postService.getTrendPost(request);
     }
 }

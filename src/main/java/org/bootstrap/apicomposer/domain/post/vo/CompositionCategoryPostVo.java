@@ -11,6 +11,6 @@ public record CompositionCategoryPostVo(
         String thumbnail,
         CategoryType category,
         Integer viewCount,
-        LocalDateTime updatedDate
+        String updatedDate
 ) {
 }
