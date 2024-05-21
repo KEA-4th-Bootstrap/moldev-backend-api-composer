@@ -4,7 +4,6 @@ import lombok.Builder;
 
 @Builder
 public record UserProfileVo(
-        Long memberId,
         String profileImgUrl,
         String moldevId,
         String nickname,
