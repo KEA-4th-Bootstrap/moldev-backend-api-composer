@@ -1,6 +1,6 @@
 package org.bootstrap.apicomposer.domain.post.dto.response;
 
-import org.bootstrap.apicomposer.domain.post.vo.PostInfoVo;
+import java.time.LocalDateTime;
 
 public record PostDetailResponseDto(
         Long memberId,
@@ -9,7 +9,7 @@ public record PostDetailResponseDto(
         String content,
         String thumbnail,
         String categoryType,
-        String lastModifiedDate,
+        LocalDateTime lastModifiedDate,
         Integer viewCount   //게시글 조회수
-){
+) {
 }
