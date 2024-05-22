@@ -31,12 +31,6 @@ public class WebClientUtil {
                 .headers(httpHeaders -> httpHeaders.addAll(headers));
     }
 
-    private static Mono<Throwable> handleErrorResponse(ClientResponse response) {
-        System.out.println("status code" + response.statusCode());
-        System.out.println(response.bodyToMono(byte[].class).toString());
-        throw MsaExceptionUtil.Exception(response.statusCode());
-    }
-
     private static <T> Mono<ResponseEntity<T>> apiRetrieve(WebClient.RequestBodySpec request, Class<T> responseClass) {
         return request.retrieve()
                 .onStatus(
@@ -85,5 +79,9 @@ public class WebClientUtil {
         return apiRetrieve(baseAPI(uri, httpMethod, headers)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(parts)), headers);
+    }
+
+    private static Mono<Throwable> handleErrorResponse(ClientResponse response) {
+        throw MsaExceptionUtil.Exception(response.statusCode());
     }
 }
