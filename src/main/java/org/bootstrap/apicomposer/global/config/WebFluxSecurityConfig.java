@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -33,6 +34,7 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 public class WebFluxSecurityConfig {
+    private final CorsConfig corsConfig;
     private final JwtProvider jwtProvider;
     private final WebClientUtil webClientUtil;
 
@@ -41,25 +43,12 @@ public class WebFluxSecurityConfig {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+                .addFilterAt(corsConfig.corsWebFilter(), SecurityWebFiltersOrder.CORS)
                 .addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
                 .addFilterAfter(new RequestRoutingWebFilter(webClientUtil), SecurityWebFiltersOrder.AUTHORIZATION)
                 .httpBasic(Customizer.withDefaults())
                 .cors(corsSpec -> corsSpec.disable());
         return http.build();
-    }
-
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // 모든 출처를 허용
-        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드를 허용
-        configuration.addAllowedHeader("*"); // 모든 헤더를 허용
-        configuration.setAllowCredentials(true); // 자격 증명 허용
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 
     @Bean
