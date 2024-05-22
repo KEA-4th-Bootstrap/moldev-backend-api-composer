@@ -13,6 +13,7 @@ import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -30,28 +31,36 @@ public class WebClientUtil {
                 .headers(httpHeaders -> httpHeaders.addAll(headers));
     }
 
+    private static Mono<Throwable> handleErrorResponse(ClientResponse response) {
+        System.out.println("status code" + response.statusCode());
+        throw MsaExceptionUtil.Exception(response.statusCode());
+    }
+
     private static <T> Mono<ResponseEntity<T>> apiRetrieve(WebClient.RequestBodySpec request, Class<T> responseClass) {
         return request.retrieve()
-                .toEntity(responseClass)
-                .onErrorResume(e -> {
-                    throw MsaExceptionUtil.Exception(e.getMessage());
-                });
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        WebClientUtil::handleErrorResponse
+                )
+                .toEntity(responseClass);
     }
 
     private static Mono<byte[]> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers) {
         return request.retrieve()
-                .bodyToMono(byte[].class)
-                .onErrorResume(e -> {
-                    throw MsaExceptionUtil.Exception(e.getMessage());
-                });
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        WebClientUtil::handleErrorResponse
+                )
+                .bodyToMono(byte[].class);
     }
 
     private static Mono<byte[]> apiRetrieve(WebClient.RequestHeadersSpec<?> requestHeadersSpec, HttpHeaders headers) {
         return requestHeadersSpec.retrieve()
-                .bodyToMono(byte[].class)
-                .onErrorResume(e -> {
-                    throw MsaExceptionUtil.Exception(e.getMessage());
-                });
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        WebClientUtil::handleErrorResponse
+                )
+                .bodyToMono(byte[].class);
     }
 
     public <T> Mono<ResponseEntity<T>> api(String uri, HttpHeaders headers, Class<T> responseClass) {
