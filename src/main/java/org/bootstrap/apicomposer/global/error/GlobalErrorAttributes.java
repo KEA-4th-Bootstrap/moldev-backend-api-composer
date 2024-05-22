@@ -18,6 +18,7 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
         if (throwable instanceof BaseErrorException) {
             BaseErrorException ex = (BaseErrorException) getError(request);
             map.put("errorCode", ex.getErrorCode().getCode());
+            map.put("status", ex.getErrorCode().getStatus());
             map.put("message", ex.getErrorCode().getMessage());
         }
         return map;

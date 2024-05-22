@@ -33,7 +33,10 @@ public class WebClientUtil {
 
     private static <T> Mono<ResponseEntity<T>> apiRetrieve(WebClient.RequestBodySpec request, Class<T> responseClass) {
         return request.retrieve()
-                .toEntity(responseClass);
+                .toEntity(responseClass)
+                .onErrorResume(e -> {
+                    throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
+                });
     }
 
     private static Mono<byte[]> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers) {
@@ -44,7 +47,7 @@ public class WebClientUtil {
                     log.error("""
                             Error calling external API: {}
                             RequestHeaders: {}
-                            """, e.getMessage(), headers);
+                            """, e.getMessage(), e.hashCode());
                     throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
                 });
     }
@@ -57,7 +60,7 @@ public class WebClientUtil {
                     log.error("""
                             Error calling external API: {}
                             RequestHeaders: {}
-                            """, e.getMessage(), headers);
+                            """, e.getMessage(), e.hashCode());
                     throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
                 });
     }
