@@ -25,6 +25,7 @@ public class MsaExceptionUtil {
     }
 
     private static Integer getErrorResponseCode(String errorResponse) {
+        System.out.println(errorResponse.substring(STATUS_CODE_LENGTH));
         return Integer.parseInt(errorResponse.substring(STATUS_CODE_LENGTH));
     }
 }
