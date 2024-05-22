@@ -8,9 +8,11 @@ import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import static org.bootstrap.apicomposer.global.common.Constants.REPLY_SERVICE_URL;
+import static org.bootstrap.apicomposer.global.common.Constants.SEARCH_SERVICE_URL;
 
 @RequiredArgsConstructor
 @Component
@@ -24,7 +26,10 @@ public class ReplyHelper {
     }
 
     public Mono<ResponseEntity<ReplyDetailListResponseDto>> getCommentReplyResult(String commentId, HttpHeaders headers) {
-        return webClientUtil.api(REPLY_SERVICE_URL + "/api/reply",
+        return webClientUtil.api(
+                UriComponentsBuilder.fromHttpUrl(REPLY_SERVICE_URL + "/api/reply")
+                        .queryParam("parentsId", commentId)
+                        .toUriString(),
                 headers,
                 ReplyDetailListResponseDto.class);
     }
