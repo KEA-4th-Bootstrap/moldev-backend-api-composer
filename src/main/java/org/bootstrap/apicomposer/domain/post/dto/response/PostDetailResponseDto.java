@@ -3,7 +3,6 @@ package org.bootstrap.apicomposer.domain.post.dto.response;
 import java.time.LocalDateTime;
 
 public record PostDetailResponseDto(
-        Long memberId,
         Long postId,
         String title,
         String content,

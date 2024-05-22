@@ -20,11 +20,11 @@ public class PostController {
         return postService.getSearchPosts(title, request);
     }
 
-    @GetMapping("/{id}")
-    public Mono<ApiResponse<?>> getPostInfo(@PathVariable("id") final Long postId,
-                                            @RequestParam final Long postWriterId,
+    @GetMapping("/{moldevId}/{postId}")
+    public Mono<ApiResponse<?>> getPostInfo(@PathVariable final String modldevId,
+                                            @PathVariable final Long postId,
                                             ServerHttpRequest request) {
-        return postService.getPostInfo(postId, postWriterId, request);
+        return postService.getPostInfo(postId, modldevId, request);
     }
 
     @GetMapping("/{moldevId}/category")

@@ -29,12 +29,6 @@ public class UserHelper {
                 UserDetailListResponseDto.class);
     }
 
-    public Mono<ResponseEntity<UserDetailResponseDto>> getUserDetailInfoResult(Long userId, HttpHeaders headers) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/" +userId,
-                headers,
-                UserDetailResponseDto.class);
-    }
-
     public Mono<ResponseEntity<UserProfileVo>> getUserProfileVo(String moldevId, HttpHeaders headers) {
         return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/" + moldevId + "/profile",
                 headers,

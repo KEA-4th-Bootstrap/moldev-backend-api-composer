@@ -10,7 +10,6 @@ import org.bootstrap.apicomposer.domain.post.vo.PostDetailWithRedisVo;
 import org.bootstrap.apicomposer.domain.reply.dto.response.CommentCountResponseDto;
 import org.bootstrap.apicomposer.domain.reply.helper.ReplyHelper;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
-import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.helper.UserHelper;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
 import org.bootstrap.apicomposer.global.common.response.ApiResponse;
@@ -59,9 +58,9 @@ public class PostService {
         });
     }
 
-    public Mono<ApiResponse<?>> getPostInfo(Long postId, Long postWriterId, ServerHttpRequest request) {
+    public Mono<ApiResponse<?>> getPostInfo(Long postId, String moldevId, ServerHttpRequest request) {
         Mono<ResponseEntity<PostDetailResponseDto>> postDetailInfoMono = postHelper.getPostDetailInfoResult(postId, request.getHeaders());
-        Mono<ResponseEntity<UserDetailResponseDto>> postWriterDetailInfoMono = userHelper.getUserDetailInfoResult(postWriterId, request.getHeaders());
+        Mono<ResponseEntity<UserProfileVo>> postWriterDetailInfoMono = userHelper.getUserProfileVo(moldevId, request.getHeaders());
         Mono<ResponseEntity<CommentCountResponseDto>> commentCountMono = replyHelper.getPostCommentCount(postId, request.getHeaders());
         return Mono.zip(postDetailInfoMono, postWriterDetailInfoMono, commentCountMono).flatMap(tuple -> {
             PostDetailTotalResponseDto responseDto = PostDetailTotalResponseDto.of(tuple.getT1().getBody(), tuple.getT2().getBody(), tuple.getT3().getBody());
