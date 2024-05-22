@@ -2,8 +2,7 @@ package org.bootstrap.apicomposer.global.webclient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bootstrap.apicomposer.global.error.ErrorCode;
-import org.bootstrap.apicomposer.global.error.exception.BaseErrorException;
+import org.bootstrap.apicomposer.global.error.MsaExceptionUtil;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +34,7 @@ public class WebClientUtil {
         return request.retrieve()
                 .toEntity(responseClass)
                 .onErrorResume(e -> {
-                    throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
+                    throw MsaExceptionUtil.Exception(e.getMessage());
                 });
     }
 
@@ -43,12 +42,7 @@ public class WebClientUtil {
         return request.retrieve()
                 .bodyToMono(byte[].class)
                 .onErrorResume(e -> {
-                    // 에러 처리 로직
-                    log.error("""
-                            Error calling external API: {}
-                            RequestHeaders: {}
-                            """, e.getMessage(), e.hashCode());
-                    throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
+                    throw MsaExceptionUtil.Exception(e.getMessage());
                 });
     }
 
@@ -56,12 +50,7 @@ public class WebClientUtil {
         return requestHeadersSpec.retrieve()
                 .bodyToMono(byte[].class)
                 .onErrorResume(e -> {
-                    // 에러 처리 로직
-                    log.error("""
-                            Error calling external API: {}
-                            RequestHeaders: {}
-                            """, e.getMessage(), e.hashCode());
-                    throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
+                    throw MsaExceptionUtil.Exception(e.getMessage());
                 });
     }
 
