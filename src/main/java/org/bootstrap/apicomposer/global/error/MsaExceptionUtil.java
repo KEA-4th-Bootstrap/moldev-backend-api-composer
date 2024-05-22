@@ -5,12 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 public class MsaExceptionUtil {
-    private final static Integer STATUS_CODE_LENGTH = 3;
-
     public static BaseErrorException Exception(HttpStatusCode errorCode) {
-//        Integer errorStatusCode = getErrorResponseCode(errorResponse);
-//        System.out.println(errorStatusCode);
-//        System.out.println(errorStatusCode.equals(HttpStatus.BAD_REQUEST.value()));
         if (errorCode.equals(HttpStatus.BAD_REQUEST))
             return new BaseErrorException(ErrorCode.BAD_REQUEST);
         else if (errorCode.equals(HttpStatus.UNAUTHORIZED))
@@ -23,11 +18,5 @@ public class MsaExceptionUtil {
             return new BaseErrorException(ErrorCode.CONFLICT);
         else
             return new BaseErrorException(ErrorCode.INTERNAL_SERVER_ERROR);
-    }
-
-    private static Integer getErrorResponseCode(String errorResponse) {
-        System.out.println(errorResponse);
-        System.out.println(errorResponse.substring(0, STATUS_CODE_LENGTH));
-        return Integer.parseInt(errorResponse.substring(0, STATUS_CODE_LENGTH));
     }
 }

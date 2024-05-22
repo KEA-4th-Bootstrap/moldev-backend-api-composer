@@ -33,6 +33,7 @@ public class WebClientUtil {
 
     private static Mono<Throwable> handleErrorResponse(ClientResponse response) {
         System.out.println("status code" + response.statusCode());
+        System.out.println(response.bodyToMono(byte[].class).toString());
         throw MsaExceptionUtil.Exception(response.statusCode());
     }
 
