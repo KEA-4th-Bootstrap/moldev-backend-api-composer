@@ -21,7 +21,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
-import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -37,18 +39,17 @@ public class WebFluxSecurityConfig {
 
     private AuthenticationWebFilter authenticationWebFilter() {
         ReactiveAuthenticationManager authenticationManager = Mono::just;
-
         AuthenticationWebFilter authenticationWebFilter
                 = new AuthenticationWebFilter(authenticationManager);
         authenticationWebFilter.setServerAuthenticationConverter(serverAuthenticationConverter());
         return authenticationWebFilter;
     }
 
-    private ServerAuthenticationConverter serverAuthenticationConverter(){
+    private ServerAuthenticationConverter serverAuthenticationConverter() {
         return exchange -> {
             String token = jwtProvider.resolveToken(exchange.getRequest());
             try {
-                if(Objects.isNull(token) || !jwtProvider.validateAccessToken(token)){
+                if (Objects.isNull(token) || !jwtProvider.validateAccessToken(token)) {
                     throw new UnAuthenticationException("Invalid Token");
                 }
                 Authentication authentication = jwtProvider.getAuthentication(token);
@@ -65,15 +66,25 @@ public class WebFluxSecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges ->
-                        exchanges
-                                .anyExchange().permitAll()
-                )
+                .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
                 .addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
                 .addFilterAfter(new RequestRoutingWebFilter(webClientUtil), SecurityWebFiltersOrder.AUTHORIZATION)
                 .httpBasic(Customizer.withDefaults());
-
         return http.build();
+    }
+
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*"); // 모든 출처를 허용
+        configuration.addAllowedMethod("*"); // 모든 HTTP 메서드를 허용
+        configuration.addAllowedHeader("*"); // 모든 헤더를 허용
+        configuration.setAllowCredentials(true); // 자격 증명 허용
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean
@@ -85,7 +96,7 @@ public class WebFluxSecurityConfig {
                 .build();
         UserDetails admin = userBuilder.username("admin")
                 .password("admin")
-                .roles("USER","ADMIN")
+                .roles("USER", "ADMIN")
                 .build();
         return new MapReactiveUserDetailsService(rob, admin);
     }
