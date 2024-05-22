@@ -47,7 +47,7 @@ public class RequestRoutingWebFilter implements WebFilter {
         headers.set("Authorization", userId);
 
         MediaType contentType = headers.getContentType();
-        String newUrl = createUrl(requestPath) + (requestUri.getQuery().isEmpty() ? "" : "?" + requestUri.getQuery());
+        String newUrl = createUrl(requestPath) + (requestUri.getQuery() == null ? "" : "?" + requestUri.getQuery());
         log.info("Routing URL: {}", newUrl);
 
         return handleRequest(requestMethod, request, contentType, newUrl, headers, exchange);
