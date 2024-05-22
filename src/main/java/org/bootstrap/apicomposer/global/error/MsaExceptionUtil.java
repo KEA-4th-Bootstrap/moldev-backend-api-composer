@@ -8,6 +8,8 @@ public class MsaExceptionUtil {
 
     public static BaseErrorException Exception(String errorResponse) {
         Integer errorStatusCode = getErrorResponseCode(errorResponse);
+        System.out.println(errorStatusCode);
+        System.out.println(errorStatusCode.equals(HttpStatus.BAD_REQUEST.value()));
         if (errorStatusCode.equals(HttpStatus.BAD_REQUEST.value()))
             return new BaseErrorException(ErrorCode.BAD_REQUEST);
         else if (errorStatusCode.equals(HttpStatus.UNAUTHORIZED.value()))
