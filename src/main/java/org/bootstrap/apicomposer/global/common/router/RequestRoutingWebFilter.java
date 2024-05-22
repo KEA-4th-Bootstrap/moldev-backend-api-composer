@@ -32,6 +32,9 @@ public class RequestRoutingWebFilter implements WebFilter {
         URI requestUri = request.getURI();
         String requestPath = requestUri.getPath();
         log.info("Request path: " + requestPath);
+        if (!request.getQueryParams().isEmpty()) {
+            log.info("path with params: {}", requestUri.getPath() + "?" + requestUri.getQuery());
+        }
 
         if (requestPath.contains("compose")) {
             log.info("Composition request: proceed to controller");
@@ -44,7 +47,7 @@ public class RequestRoutingWebFilter implements WebFilter {
         headers.set("Authorization", userId);
 
         MediaType contentType = headers.getContentType();
-        String newUrl = createUrl(requestPath);
+        String newUrl = createUrl(requestPath) + (requestUri.getQuery().isEmpty() ? "" : "?" + requestUri.getQuery());
         log.info("Routing URL: {}", newUrl);
 
         return handleRequest(requestMethod, request, contentType, newUrl, headers, exchange);
