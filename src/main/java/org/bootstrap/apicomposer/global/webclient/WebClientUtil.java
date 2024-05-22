@@ -2,6 +2,8 @@ package org.bootstrap.apicomposer.global.webclient;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bootstrap.apicomposer.global.error.ErrorCode;
+import org.bootstrap.apicomposer.global.error.exception.BaseErrorException;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpHeaders;
@@ -43,8 +45,7 @@ public class WebClientUtil {
                             Error calling external API: {}
                             RequestHeaders: {}
                             """, e.getMessage(), headers);
-
-                    return Mono.empty();
+                    throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
                 });
     }
 
@@ -57,8 +58,7 @@ public class WebClientUtil {
                             Error calling external API: {}
                             RequestHeaders: {}
                             """, e.getMessage(), headers);
-
-                    return Mono.empty();
+                    throw new BaseErrorException(ErrorCode.INVALID_REQUEST);
                 });
     }
 
