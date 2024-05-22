@@ -21,10 +21,10 @@ public class PostController {
     }
 
     @GetMapping("/{moldevId}/{postId}")
-    public Mono<ApiResponse<?>> getPostInfo(@PathVariable final String modldevId,
+    public Mono<ApiResponse<?>> getPostInfo(@PathVariable final String moldevId,
                                             @PathVariable final Long postId,
                                             ServerHttpRequest request) {
-        return postService.getPostInfo(postId, modldevId, request);
+        return postService.getPostInfo(postId, moldevId, request);
     }
 
     @GetMapping("/{moldevId}/category")
