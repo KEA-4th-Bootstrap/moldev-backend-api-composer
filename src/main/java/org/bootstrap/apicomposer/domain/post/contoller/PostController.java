@@ -21,7 +21,7 @@ public class PostController {
     }
 
     @GetMapping("/{moldevId}/{postId}")
-    public Mono<ApiResponse<?>> getPostInfo(@PathVariable final String moldevId,
+    public Mono<ApiResponse<?>> getPostDetail(@PathVariable final String moldevId,
                                             @PathVariable final Long postId,
                                             ServerHttpRequest request) {
         return postService.getPostInfo(postId, moldevId, request);

@@ -7,7 +7,7 @@ public record PostDetailResponseDto(
         String title,
         String content,
         String thumbnail,
-        String categoryType,
+        String category,
         LocalDateTime lastModifiedDate,
         Integer viewCount   //게시글 조회수
 ) {
