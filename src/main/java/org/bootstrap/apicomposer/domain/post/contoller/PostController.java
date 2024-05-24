@@ -17,7 +17,7 @@ public class PostController {
     @GetMapping("/search")
     public Mono<ApiResponse<?>> getSearchPosts(@RequestParam final String title,
                                                @RequestParam(required = false, defaultValue = "10") Integer size,
-                                               @RequestParam(required = false, defaultValue = "10") Integer page,
+                                               @RequestParam(required = false, defaultValue = "0") Integer page,
                                                ServerHttpRequest request) {
         return postService.getSearchPosts(title, size, page, request);
     }
@@ -39,5 +39,10 @@ public class PostController {
     @GetMapping("/trend")
     public Mono<ApiResponse<?>> getTrendPost(ServerHttpRequest request) {
         return postService.getTrendPost(request);
+    }
+
+    @GetMapping("/trend-island")
+    public Mono<ApiResponse<?>> getTrendIsland(ServerHttpRequest request) {
+        return postService.getTrendIsland(request);
     }
 }

@@ -1,6 +1,7 @@
 package org.bootstrap.apicomposer.domain.user.helper;
 
 import lombok.RequiredArgsConstructor;
+import org.bootstrap.apicomposer.domain.user.dto.response.TrendingMembersListResponseDto;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
@@ -33,5 +34,11 @@ public class UserHelper {
         return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/" + moldevId + "/profile",
                 headers,
                 UserProfileVo.class);
+    }
+
+    public Mono<ResponseEntity<TrendingMembersListResponseDto>> getTrendIslands(HttpHeaders headers){
+        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/trend",
+                headers,
+                TrendingMembersListResponseDto.class);
     }
 }
