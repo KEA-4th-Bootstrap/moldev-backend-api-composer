@@ -88,7 +88,10 @@ public class PostService {
                             });
                 })
                 .collectList()
-                .map(trendIslandResponseDtos -> ApiResponse.of(SuccessCode.SUCCESS, trendIslandResponseDtos));
+                .map(trendIslandResponseDtos -> {
+                    TrendIslandListResponseDto responseDto = TrendIslandListResponseDto.of(trendIslandResponseDtos);
+                    return ApiResponse.of(SuccessCode.SUCCESS, responseDto);
+                });
     }
 
     public Mono<ApiResponse<?>> getTrendPost(ServerHttpRequest request) {
