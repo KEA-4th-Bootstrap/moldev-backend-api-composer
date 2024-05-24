@@ -16,8 +16,10 @@ public class PostController {
 
     @GetMapping("/search")
     public Mono<ApiResponse<?>> getSearchPosts(@RequestParam final String title,
+                                               @RequestParam(required = false, defaultValue = "10") Integer size,
+                                               @RequestParam(required = false, defaultValue = "10") Integer page,
                                                ServerHttpRequest request) {
-        return postService.getSearchPosts(title, request);
+        return postService.getSearchPosts(title, size, page, request);
     }
 
     @GetMapping("/{moldevId}/{postId}")

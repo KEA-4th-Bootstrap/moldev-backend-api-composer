@@ -21,10 +21,12 @@ import static org.bootstrap.apicomposer.global.common.Constants.SEARCH_SERVICE_U
 public class PostHelper {
     private final WebClientUtil webClientUtil;
 
-    public Mono<ResponseEntity<PostDetailListResponseDto>> getSearchPostResult(String text, HttpHeaders headers) {
+    public Mono<ResponseEntity<PostDetailListResponseDto>> getSearchPostResult(String text, Integer size, Integer page, HttpHeaders headers) {
         return webClientUtil.api(
                 UriComponentsBuilder.fromHttpUrl(SEARCH_SERVICE_URL + "/api/search/posts")
                         .queryParam("title", text)
+                        .queryParam("size", size)
+                        .queryParam("page", page)
                         .toUriString(),
                 headers,
                 PostDetailListResponseDto.class);
