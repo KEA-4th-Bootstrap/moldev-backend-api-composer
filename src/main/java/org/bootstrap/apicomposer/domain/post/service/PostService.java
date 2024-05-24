@@ -74,36 +74,21 @@ public class PostService {
 
     public Mono<ApiResponse<?>> getTrendIsland(ServerHttpRequest request) {
         return userHelper.getTrendIslands(request.getHeaders())
-                .flatMap(responseEntity -> {
+                .flatMapMany(responseEntity -> {
                     TrendingMembersListResponseDto trendingMembersList = responseEntity.getBody();
                     List<TrendingMembersResponseDto> trendingMembers = trendingMembersList.trendingMembersResponseDtos();
-
-                    return Flux.fromIterable(trendingMembers)
-                            .flatMap(member -> {
-                                String moldevId = member.memberProfileResponseDto().moldevId();
-                                return postHelper.getTrendIslandPostList(moldevId, request.getHeaders())
-                                        .map(postResponseEntity -> {
-                                            RecentPostsResponseListDto recentPosts = postResponseEntity.getBody();
-                                            return TrendIslandResponseDto.of(
-                                                    recentPosts,
-                                                    TrendingMembersListResponseDto.of(List.of(member))
-                                            );
-                                        });
-                            })
-                            .collectList();
+                    return Flux.fromIterable(trendingMembers);
                 })
-                .map(trendIslandResponseDtos -> {
-                    List<RecentPostsResponseDto> allRecentPosts = trendIslandResponseDtos.stream()
-                            .flatMap(dto -> dto.postInfo().recentPostsResponseDtoList().stream())
-                            .collect(Collectors.toList());
-                    List<TrendingMembersResponseDto> allTrendingMembers = trendIslandResponseDtos.stream()
-                            .flatMap(dto -> dto.userInfo().trendingMembersResponseDtos().stream())
-                            .collect(Collectors.toList());
-                    RecentPostsResponseListDto combinedPostInfo = RecentPostsResponseListDto.of(allRecentPosts);
-                    TrendingMembersListResponseDto combinedUserInfo = TrendingMembersListResponseDto.of(allTrendingMembers);
-                    return TrendIslandResponseDto.of(combinedPostInfo, combinedUserInfo);
+                .flatMap(member -> {
+                    String moldevId = member.memberProfileResponseDto().moldevId();
+                    return postHelper.getTrendIslandPostList(moldevId, request.getHeaders())
+                            .map(postResponseEntity -> {
+                                RecentPostsResponseListDto recentPosts = postResponseEntity.getBody();
+                                return TrendIslandResponseDto.of(recentPosts, TrendingMembersListResponseDto.of(List.of(member)));
+                            });
                 })
-                .map(responseDto -> ApiResponse.of(SuccessCode.SUCCESS, responseDto));
+                .collectList()
+                .map(trendIslandResponseDtos -> ApiResponse.of(SuccessCode.SUCCESS, trendIslandResponseDtos));
     }
 
     public Mono<ApiResponse<?>> getTrendPost(ServerHttpRequest request) {
