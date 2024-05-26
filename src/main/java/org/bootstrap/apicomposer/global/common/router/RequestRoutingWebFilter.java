@@ -41,6 +41,11 @@ public class RequestRoutingWebFilter implements WebFilter {
             return chain.filter(exchange);
         }
 
+        if (requestPath.contains("login")) {
+            log.info("Login request");
+            return webClientUtil.login(exchange);
+        }
+
         String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
         HttpHeaders headers = new HttpHeaders();
         headers.addAll(request.getHeaders());

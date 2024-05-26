@@ -1,20 +1,22 @@
 package org.bootstrap.apicomposer.global.webclient;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bootstrap.apicomposer.global.common.response.ApiResponse;
+import org.bootstrap.apicomposer.global.common.response.SuccessCode;
 import org.bootstrap.apicomposer.global.error.MsaExceptionUtil;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -86,5 +88,26 @@ public class WebClientUtil {
 
     private static Mono<Throwable> handleErrorResponse(ClientResponse response) {
         throw MsaExceptionUtil.Exception(response.statusCode());
+    }
+
+    public Mono<Void> login(ServerWebExchange exchange) {
+        return webClientConfig.webClient().method(HttpMethod.POST)
+                .uri("auth-service.backend.svc:80/api/auth/login")
+                .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
+                .body(BodyInserters.fromDataBuffers(exchange.getRequest().getBody()))
+                .exchangeToMono(clientResponse -> {
+                    HttpHeaders responseHeaders = clientResponse.headers().asHttpHeaders();
+
+                    exchange.getResponse().getHeaders().addAll(responseHeaders);
+
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(body -> {
+                                Gson gson = new Gson();
+                                JsonObject dataJson = gson.fromJson(body, JsonObject.class);
+                                String json = gson.toJson(ApiResponse.of(SuccessCode.SUCCESS, dataJson));
+                                return exchange.getResponse().writeWith(
+                                        Mono.just(exchange.getResponse().bufferFactory().wrap(json.getBytes())));
+                            });
+                });
     }
 }
