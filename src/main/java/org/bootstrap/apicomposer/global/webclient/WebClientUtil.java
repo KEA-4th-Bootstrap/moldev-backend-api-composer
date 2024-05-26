@@ -37,7 +37,8 @@ public class WebClientUtil {
                         status -> status.is4xxClientError() || status.is5xxServerError(),
                         WebClientUtil::handleErrorResponse
                 )
-                .toEntity(responseClass);
+                .toEntity(responseClass)
+                .retry(2);
     }
 
     private static Mono<byte[]> apiRetrieve(WebClient.RequestBodySpec request, HttpHeaders headers) {
@@ -46,7 +47,8 @@ public class WebClientUtil {
                         status -> status.is4xxClientError() || status.is5xxServerError(),
                         WebClientUtil::handleErrorResponse
                 )
-                .bodyToMono(byte[].class);
+                .bodyToMono(byte[].class)
+                .retry(2);
     }
 
     private static Mono<byte[]> apiRetrieve(WebClient.RequestHeadersSpec<?> requestHeadersSpec, HttpHeaders headers) {
@@ -55,7 +57,8 @@ public class WebClientUtil {
                         status -> status.is4xxClientError() || status.is5xxServerError(),
                         WebClientUtil::handleErrorResponse
                 )
-                .bodyToMono(byte[].class);
+                .bodyToMono(byte[].class)
+                .retry(2);
     }
 
     public <T> Mono<ResponseEntity<T>> api(String uri, HttpHeaders headers, Class<T> responseClass) {
