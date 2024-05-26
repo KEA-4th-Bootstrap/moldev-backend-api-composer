@@ -38,16 +38,28 @@ public class WebFluxSecurityConfig {
     private final JwtProvider jwtProvider;
     private final WebClientUtil webClientUtil;
 
+    private static final String[] whiteList = {
+            "/api/auth/**",
+            "/api/post/*/category/list",
+            "/api/post/mission-control",
+            "/api/member/password",
+            "/api/compose/**",
+            "/api/search/**"
+    };
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll())
+                .authorizeExchange(exchanges -> exchanges
+                        .pathMatchers(whiteList).permitAll()
+                        .anyExchange().authenticated()
+                )
                 .addFilterAt(corsConfig.corsWebFilter(), SecurityWebFiltersOrder.CORS)
                 .addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
                 .addFilterAfter(new RequestRoutingWebFilter(webClientUtil), SecurityWebFiltersOrder.AUTHORIZATION)
                 .httpBasic(Customizer.withDefaults())
-                .cors(corsSpec -> corsSpec.disable());
+                .cors(ServerHttpSecurity.CorsSpec::disable);
         return http.build();
     }
 
