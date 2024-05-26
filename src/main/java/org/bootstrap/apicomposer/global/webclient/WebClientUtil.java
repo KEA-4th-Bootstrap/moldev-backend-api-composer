@@ -92,7 +92,7 @@ public class WebClientUtil {
 
     public Mono<Void> login(ServerWebExchange exchange) {
         return webClientConfig.webClient().method(HttpMethod.POST)
-                .uri("auth-service.backend.svc:80/api/auth/login")
+                .uri("http://auth-service.backend.svc:80/api/auth/login")
                 .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
                 .body(BodyInserters.fromDataBuffers(exchange.getRequest().getBody()))
                 .exchangeToMono(clientResponse -> {
