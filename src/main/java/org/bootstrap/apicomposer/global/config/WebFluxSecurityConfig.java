@@ -43,6 +43,7 @@ public class WebFluxSecurityConfig {
             "/api/post/*/category/list",
             "/api/post/mission-control",
             "/api/member/password",
+            "/api/member/*/profile",
             "/api/compose/**",
             "/api/search/**"
     };
