@@ -97,8 +97,8 @@ public class WebClientUtil {
                 .body(BodyInserters.fromDataBuffers(exchange.getRequest().getBody()))
                 .exchangeToMono(clientResponse -> {
                     HttpHeaders responseHeaders = clientResponse.headers().asHttpHeaders();
-
-                    exchange.getResponse().getHeaders().addAll(responseHeaders);
+                    exchange.getResponse().getHeaders().add("Set-Cookie", responseHeaders.getFirst("Set-Cookie"));
+                    log.info("Response headers: {}", exchange.getResponse().getHeaders());
 
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(body -> {
