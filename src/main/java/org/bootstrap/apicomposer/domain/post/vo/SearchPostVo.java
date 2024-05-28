@@ -4,7 +4,7 @@ import org.bootstrap.apicomposer.domain.post.type.CategoryType;
 import org.bootstrap.apicomposer.global.utils.MemberIdField;
 
 public record SearchPostVo(
-        Long postId,
+        Long id,
         Long memberId,
         String title,
         String content,
