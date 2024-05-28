@@ -18,7 +18,6 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
@@ -53,7 +52,7 @@ public class RequestRoutingWebFilter implements WebFilter {
         headers.set("Authorization", userId);
 
         MediaType contentType = headers.getContentType();
-        String newUrl = createUrl(requestPath) + (requestUri.getQuery() == null ? "" : "?" + encodedText(requestUri.getQuery()));
+        String newUrl = createUrl(requestPath) + (requestUri.getQuery() == null ? "" : "?" + requestUri.getQuery());
         log.info("Routing URL: {}", newUrl);
 
         return handleRequest(requestMethod, request, contentType, newUrl, headers, exchange);
@@ -88,9 +87,5 @@ public class RequestRoutingWebFilter implements WebFilter {
         String domain = path.split("/")[2];
         log.info("target: {} service", domain);
         return String.format("http://%s-service.backend.svc.cluster.local:80%s", domain, path);
-    }
-
-    private String encodedText(String text) {
-        return URLEncoder.encode(text, StandardCharsets.UTF_8);
     }
 }
