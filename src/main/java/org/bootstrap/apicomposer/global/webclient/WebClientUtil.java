@@ -96,11 +96,15 @@ public class WebClientUtil {
                 .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
                 .body(BodyInserters.fromDataBuffers(exchange.getRequest().getBody()))
                 .exchangeToMono(clientResponse -> {
+                    if (clientResponse.statusCode().is4xxClientError() || clientResponse.statusCode().is5xxServerError()) {
+                        throw MsaExceptionUtil.Exception(clientResponse.statusCode());
+                    }
                     HttpHeaders responseHeaders = clientResponse.headers().asHttpHeaders();
                     exchange.getResponse().getHeaders().add("Set-Cookie", responseHeaders.getFirst("Set-Cookie"));
                     log.info("Response headers: {}", exchange.getResponse().getHeaders());
 
-                    return clientResponse.bodyToMono(String.class)
+                    return clientResponse
+                            .bodyToMono(String.class)
                             .flatMap(body -> {
                                 Gson gson = new Gson();
                                 JsonObject dataJson = gson.fromJson(body, JsonObject.class);
