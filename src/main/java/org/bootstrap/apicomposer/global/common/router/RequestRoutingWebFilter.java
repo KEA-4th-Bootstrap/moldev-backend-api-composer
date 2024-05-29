@@ -87,7 +87,7 @@ public class RequestRoutingWebFilter implements WebFilter {
     private String createUrl(String path, ServerHttpRequest request) {
         String domain = path.split("/")[2];
         log.info("target: {} service", domain);
-        return UriComponentsBuilder.fromHttpUrl(String.format("http://localhost:8081%s", path))
+        return UriComponentsBuilder.fromHttpUrl(String.format("http://%s-service.backend.svc:80%s", domain, path))
                         .replaceQueryParams(request.getQueryParams())
                         .toUriString();
     }
