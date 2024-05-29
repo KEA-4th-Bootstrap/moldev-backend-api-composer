@@ -15,6 +15,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -52,10 +53,10 @@ public class RequestRoutingWebFilter implements WebFilter {
         headers.set("Authorization", userId);
 
         MediaType contentType = headers.getContentType();
-        String newUrl = createUrl(requestPath) + (requestUri.getQuery() == null ? "" : "?" + requestUri.getQuery());
-        log.info("Routing URL: {}", newUrl);
+        String newUri = createUrl(requestPath, request);
+        log.info("Routing URL: {}", newUri);
 
-        return handleRequest(requestMethod, request, contentType, newUrl, headers, exchange);
+        return handleRequest(requestMethod, request, contentType, newUri, headers, exchange);
     }
 
     private Mono<Void> handleRequest(HttpMethod method, ServerHttpRequest request, MediaType contentType, String url, HttpHeaders headers, ServerWebExchange exchange) {
@@ -83,9 +84,11 @@ public class RequestRoutingWebFilter implements WebFilter {
         return exchange.getResponse().writeWith(Mono.just(exchange.getResponse().bufferFactory().wrap(json.getBytes())));
     }
 
-    private String createUrl(String path) {
+    private String createUrl(String path, ServerHttpRequest request) {
         String domain = path.split("/")[2];
         log.info("target: {} service", domain);
-        return String.format("http://%s-service.backend.svc.cluster.local:80%s", domain, path);
+        return UriComponentsBuilder.fromHttpUrl(String.format("http://localhost:8081%s", path))
+                        .replaceQueryParams(request.getQueryParams())
+                        .toUriString();
     }
 }
