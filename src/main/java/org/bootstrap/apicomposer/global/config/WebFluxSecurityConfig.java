@@ -40,6 +40,7 @@ public class WebFluxSecurityConfig {
 
     private static final String[] whiteList = {
             "/api/auth/**",
+            "/api/post/mission-control",
             "/api/post/*/category",
             "/api/post/*/category/list",
             "/api/post/mission-control",
