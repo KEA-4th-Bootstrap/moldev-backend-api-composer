@@ -7,6 +7,7 @@ import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -40,5 +41,12 @@ public class UserHelper {
         return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/trend",
                 headers,
                 TrendingMembersListResponseDto.class);
+    }
+
+    public Mono<byte[]> banUser(HttpHeaders headers, Object requestBody) {
+        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/ban",
+                HttpMethod.POST,
+                requestBody,
+                headers);
     }
 }
