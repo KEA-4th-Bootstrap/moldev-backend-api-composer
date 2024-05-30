@@ -49,6 +49,7 @@ public class RequestRoutingWebFilter implements WebFilter {
 
         String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
         HttpHeaders headers = new HttpHeaders();
+        System.out.println(headers + "set cookie headers");
         headers.addAll(request.getHeaders());
         headers.set("Authorization", userId);
 
