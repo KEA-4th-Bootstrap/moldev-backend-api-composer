@@ -29,7 +29,6 @@ public class RequestRoutingWebFilter implements WebFilter {
     @Override
     public Mono<Void> filter(@Nonnull ServerWebExchange exchange, @Nonnull WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
-        System.out.println(request.getCookies() + "set cookie request");
         HttpMethod requestMethod = request.getMethod();
         URI requestUri = request.getURI();
         String requestPath = requestUri.getPath();
@@ -50,7 +49,6 @@ public class RequestRoutingWebFilter implements WebFilter {
 
         String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);
         HttpHeaders headers = new HttpHeaders();
-        System.out.println(headers + "set cookie headers");
         headers.addAll(request.getHeaders());
         headers.set("Authorization", userId);
 
