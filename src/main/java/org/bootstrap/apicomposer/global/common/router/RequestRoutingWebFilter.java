@@ -32,13 +32,13 @@ public class RequestRoutingWebFilter implements WebFilter {
         HttpMethod requestMethod = request.getMethod();
         URI requestUri = request.getURI();
         String requestPath = requestUri.getPath();
-        log.info("Request path: " + requestPath);
+        log.info("Request path - " + requestPath);
         if (!request.getQueryParams().isEmpty()) {
-            log.info("path with params: {}", requestUri.getPath() + "?" + requestUri.getQuery());
+            log.info("path with params - {}", requestUri.getPath() + "?" + requestUri.getQuery());
         }
 
         if (requestPath.contains("compose")) {
-            log.info("Composition request: proceed to controller");
+            log.info("Composition request - proceed to controller");
             return chain.filter(exchange);
         }
 
@@ -57,7 +57,7 @@ public class RequestRoutingWebFilter implements WebFilter {
 
         MediaType contentType = headers.getContentType();
         String newUri = createUrl(requestPath, request);
-        log.info("Routing URL: {}", newUri);
+        log.info("Routing URL - {}", newUri);
 
         return handleRequest(requestMethod, request, contentType, newUri, headers, exchange);
     }
@@ -74,7 +74,7 @@ public class RequestRoutingWebFilter implements WebFilter {
             return webClientUtil.api(url, HttpMethod.GET, headers)
                     .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)));
         } else {
-            return Mono.error(new UnsupportedOperationException("Unsupported content type: " + contentType));
+            return Mono.error(new UnsupportedOperationException("Unsupported content type - " + contentType));
         }
     }
 
@@ -89,7 +89,7 @@ public class RequestRoutingWebFilter implements WebFilter {
 
     private String createUrl(String path, ServerHttpRequest request) {
         String domain = path.split("/")[2];
-        log.info("target: {} service", domain);
+        log.info("target - {} service", domain);
         return UriComponentsBuilder.fromHttpUrl(String.format("http://%s-service.backend.svc:80%s", domain, path))
                         .replaceQueryParams(request.getQueryParams())
                         .toUriString();
