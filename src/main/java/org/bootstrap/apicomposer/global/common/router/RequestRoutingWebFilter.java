@@ -38,15 +38,12 @@ public class RequestRoutingWebFilter implements WebFilter {
         }
 
         if (requestPath.contains("compose")) {
-            log.info("Composition request - proceed to controller");
             return chain.filter(exchange);
         }
 
         if (requestPath.contains("login")) {
-            log.info("Login request");
             return webClientUtil.setCookieApi(exchange, requestPath);
         } else if (requestPath.contains("reissue")) {
-            log.info("Reissue request");
             return webClientUtil.setCookieApi(exchange, requestPath);
         }
 
