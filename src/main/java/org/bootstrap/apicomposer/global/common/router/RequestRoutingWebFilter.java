@@ -44,7 +44,10 @@ public class RequestRoutingWebFilter implements WebFilter {
 
         if (requestPath.contains("login")) {
             log.info("Login request");
-            return webClientUtil.login(exchange);
+            return webClientUtil.setCookieApi(exchange, requestPath);
+        } else if (requestPath.contains("reissue")) {
+            log.info("Reissue request");
+            return webClientUtil.setCookieApi(exchange, requestPath);
         }
 
         String userId = exchange.getAttribute(HttpHeaders.AUTHORIZATION);

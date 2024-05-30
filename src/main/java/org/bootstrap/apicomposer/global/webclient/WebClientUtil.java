@@ -90,9 +90,9 @@ public class WebClientUtil {
         throw MsaExceptionUtil.Exception(response.statusCode());
     }
 
-    public Mono<Void> login(ServerWebExchange exchange) {
+    public Mono<Void> setCookieApi(ServerWebExchange exchange, String path) {
         return webClientConfig.webClient().method(HttpMethod.POST)
-                .uri("http://auth-service.backend.svc:80/api/auth/login")
+                .uri("http://auth-service.backend.svc:80" + path)
                 .headers(headers -> headers.addAll(exchange.getRequest().getHeaders()))
                 .body(BodyInserters.fromDataBuffers(exchange.getRequest().getBody()))
                 .exchangeToMono(clientResponse -> {
