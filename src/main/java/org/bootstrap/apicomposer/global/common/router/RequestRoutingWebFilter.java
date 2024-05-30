@@ -29,6 +29,7 @@ public class RequestRoutingWebFilter implements WebFilter {
     @Override
     public Mono<Void> filter(@Nonnull ServerWebExchange exchange, @Nonnull WebFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        System.out.println(request + "set cookie request");
         HttpMethod requestMethod = request.getMethod();
         URI requestUri = request.getURI();
         String requestPath = requestUri.getPath();
