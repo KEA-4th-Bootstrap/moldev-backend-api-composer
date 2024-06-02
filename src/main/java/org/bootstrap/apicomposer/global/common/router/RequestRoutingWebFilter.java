@@ -33,9 +33,6 @@ public class RequestRoutingWebFilter implements WebFilter {
         URI requestUri = request.getURI();
         String requestPath = requestUri.getPath();
         log.info("Request path - " + requestPath);
-        if (!request.getQueryParams().isEmpty()) {
-            log.info("path with params - {}", requestUri.getPath() + "?" + requestUri.getQuery());
-        }
 
         if (requestPath.contains("compose")) {
             return chain.filter(exchange);
