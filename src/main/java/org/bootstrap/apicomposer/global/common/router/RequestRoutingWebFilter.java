@@ -64,8 +64,8 @@ public class RequestRoutingWebFilter implements WebFilter {
             return exchange.getMultipartData()
                     .flatMap(parts -> webClientUtil.api(method, url, parts, headers))
                     .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)));
-        } else if (method.equals(HttpMethod.GET)) {
-            return webClientUtil.api(url, HttpMethod.GET, headers)
+        } else if (method.equals(HttpMethod.GET) || method.equals(HttpMethod.DELETE)) {
+            return webClientUtil.api(url, method, headers)
                     .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)));
         } else {
             return Mono.error(new UnsupportedOperationException("Unsupported content type - " + contentType));
