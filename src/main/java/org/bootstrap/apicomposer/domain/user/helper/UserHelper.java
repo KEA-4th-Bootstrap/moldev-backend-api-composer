@@ -1,9 +1,9 @@
 package org.bootstrap.apicomposer.domain.user.helper;
 
 import lombok.RequiredArgsConstructor;
+import org.bootstrap.apicomposer.domain.post.dto.response.TrendUserDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.user.dto.response.TrendingMembersListResponseDto;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
-import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailResponseDto;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.http.HttpHeaders;
@@ -37,7 +37,16 @@ public class UserHelper {
                 UserProfileVo.class);
     }
 
-    public Mono<ResponseEntity<TrendingMembersListResponseDto>> getTrendIslands(HttpHeaders headers){
+    public Mono<ResponseEntity<TrendUserDetailListResponseDto>> getUserProfileVoByMoldevIds(List<String> moldevIds, HttpHeaders headers) {
+        return webClientUtil.api(
+                UriComponentsBuilder.fromHttpUrl(MEMBER_SERVICE_URL + "/api/member/moldev_info")
+                        .queryParam("ids", moldevIds)
+                        .toUriString(),
+                headers,
+                TrendUserDetailListResponseDto.class);
+    }
+
+    public Mono<ResponseEntity<TrendingMembersListResponseDto>> getTrendIslands(HttpHeaders headers) {
         return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/trend",
                 headers,
                 TrendingMembersListResponseDto.class);
