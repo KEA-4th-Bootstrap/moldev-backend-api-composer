@@ -9,6 +9,7 @@ import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -56,31 +57,25 @@ public class WebFluxSecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(whiteList).permitAll()
                         .anyExchange().authenticated()
                 )
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .addFilterAt(corsConfig.corsWebFilter(), SecurityWebFiltersOrder.CORS)
-                .addFilterBefore(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
-                .addFilterAfter(new RequestRoutingWebFilter(webClientUtil), SecurityWebFiltersOrder.AUTHORIZATION)
-                .httpBasic(Customizer.withDefaults())
+                .addFilterAt(authenticationWebFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
+                .addFilterAt(new RequestRoutingWebFilter(webClientUtil), SecurityWebFiltersOrder.LAST)
+                .exceptionHandling(exceptionHandlingSpec ->
+                        exceptionHandlingSpec
+                                .authenticationEntryPoint((exchange, ex) -> {
+                                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                                    return exchange.getResponse().setComplete();
+                                })
+                )
                 .cors(ServerHttpSecurity.CorsSpec::disable);
         return http.build();
-    }
-
-    @Bean
-    MapReactiveUserDetailsService userDetailsService() {
-        User.UserBuilder userBuilder = User.withDefaultPasswordEncoder();
-        UserDetails rob = userBuilder.username("rob")
-                .password("rob")
-                .roles("USER")
-                .build();
-        UserDetails admin = userBuilder.username("admin")
-                .password("admin")
-                .roles("USER", "ADMIN")
-                .build();
-        return new MapReactiveUserDetailsService(rob, admin);
     }
 
     private AuthenticationWebFilter authenticationWebFilter() {
