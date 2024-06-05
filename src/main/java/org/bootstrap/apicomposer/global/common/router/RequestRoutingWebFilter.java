@@ -20,6 +20,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -66,7 +67,9 @@ public class RequestRoutingWebFilter implements WebFilter {
                     .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)));
         } else if (method.equals(HttpMethod.GET) || method.equals(HttpMethod.DELETE)) {
             return webClientUtil.api(url, method, headers)
-                    .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)));
+                    .filter(Objects::nonNull)
+                    .flatMap(data -> writeResponse(exchange, new String(data, StandardCharsets.UTF_8)))
+                    .switchIfEmpty(writeResponse(exchange, null));
         } else {
             return Mono.error(new UnsupportedOperationException("Unsupported content type - " + contentType));
         }
