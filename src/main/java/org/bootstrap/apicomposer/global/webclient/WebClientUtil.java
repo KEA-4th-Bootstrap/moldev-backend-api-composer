@@ -63,6 +63,21 @@ public class WebClientUtil {
                 .retry(2);
     }
 
+    public <T> Mono<ResponseEntity<T>> getApiWithBody(String uri, HttpHeaders headers, Object requestBody, Class<T> responseClass) {
+        return webClientConfig.webClient()
+                .method(HttpMethod.GET)
+                .uri(uri)
+                .headers(httpHeaders -> httpHeaders.addAll(headers))
+                .bodyValue(requestBody)
+                .retrieve()
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        WebClientUtil::handleErrorResponse
+                )
+                .toEntity(responseClass)
+                .retry(2);
+    }
+
     public <T> Mono<ResponseEntity<T>> api(String uri, HttpHeaders headers, Class<T> responseClass) {
         WebClient.RequestBodySpec requestBodySpec = baseAPI(uri, HttpMethod.GET, headers);
         return apiRetrieve(requestBodySpec, responseClass);

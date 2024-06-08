@@ -2,6 +2,7 @@ package org.bootstrap.apicomposer.domain.user.helper;
 
 import lombok.RequiredArgsConstructor;
 import org.bootstrap.apicomposer.domain.post.dto.response.TrendUserDetailListResponseDto;
+import org.bootstrap.apicomposer.domain.user.dto.response.BanDaysListResponseDto;
 import org.bootstrap.apicomposer.domain.user.dto.response.TrendingMembersListResponseDto;
 import org.bootstrap.apicomposer.domain.user.dto.response.UserDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.user.vo.UserProfileVo;
@@ -52,10 +53,17 @@ public class UserHelper {
                 TrendingMembersListResponseDto.class);
     }
 
-    public Mono<byte[]> banUser(HttpHeaders headers, Object requestBody) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/ban",
+    public Mono<byte[]> banUser(Long reportId, HttpHeaders headers, Object requestBody) {
+        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/ban/" + reportId,
                 HttpMethod.POST,
                 requestBody,
                 headers);
+    }
+
+    public Mono<ResponseEntity<BanDaysListResponseDto>> getUserBanDaysInfo(Object requestBody, HttpHeaders headers) {
+        return webClientUtil.getApiWithBody(MEMBER_SERVICE_URL + "/api/member/banInfoOfReport",
+                headers,
+                requestBody,
+                BanDaysListResponseDto.class);
     }
 }
