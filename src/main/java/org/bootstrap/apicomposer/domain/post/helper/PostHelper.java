@@ -1,10 +1,7 @@
 package org.bootstrap.apicomposer.domain.post.helper;
 
 import lombok.RequiredArgsConstructor;
-import org.bootstrap.apicomposer.domain.post.dto.response.PostDetailListResponseDto;
-import org.bootstrap.apicomposer.domain.post.dto.response.PostDetailResponseDto;
-import org.bootstrap.apicomposer.domain.post.dto.response.RecentPostsResponseListDto;
-import org.bootstrap.apicomposer.domain.post.dto.response.TrendPostDetailListResponseDto;
+import org.bootstrap.apicomposer.domain.post.dto.response.*;
 import org.bootstrap.apicomposer.domain.post.type.CategoryType;
 import org.bootstrap.apicomposer.domain.post.vo.CategoryPostVo;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
@@ -53,5 +50,9 @@ public class PostHelper {
 
     public Mono<ResponseEntity<RecentPostsResponseListDto>> getTrendIslandPostList(String moldevId, HttpHeaders headers){
         return webClientUtil.api(POST_SERVICE_URL + "/api/post/" + moldevId + "/recents", headers, RecentPostsResponseListDto.class);
+    }
+
+    public Mono<ResponseEntity<PostReportDetailResponseDto>> getPostReportDetail(Long postId, HttpHeaders headers) {
+        return webClientUtil.api(POST_SERVICE_URL + "/api/post/report/" + postId, headers, PostReportDetailResponseDto.class);
     }
 }

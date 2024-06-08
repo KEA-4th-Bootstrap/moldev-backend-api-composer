@@ -1,10 +1,10 @@
 package org.bootstrap.apicomposer.domain.report.service;
 
 import lombok.RequiredArgsConstructor;
-import org.bootstrap.apicomposer.domain.report.dto.BanDaysRequestDto;
-import org.bootstrap.apicomposer.domain.report.dto.ReportResponseDto;
-import org.bootstrap.apicomposer.domain.report.dto.ReportWithBandaysListResponseDto;
-import org.bootstrap.apicomposer.domain.report.dto.ReportWithBandaysResponseDto;
+import org.bootstrap.apicomposer.domain.post.dto.response.PostReportDetailResponseDto;
+import org.bootstrap.apicomposer.domain.post.helper.PostHelper;
+import org.bootstrap.apicomposer.domain.reply.helper.ReplyHelper;
+import org.bootstrap.apicomposer.domain.report.dto.*;
 import org.bootstrap.apicomposer.domain.report.entity.ReportType;
 import org.bootstrap.apicomposer.domain.report.helper.ReportHelper;
 import org.bootstrap.apicomposer.domain.report.vo.ReportResponseVo;
@@ -24,6 +24,8 @@ import java.util.List;
 public class ReportService {
     private final ReportHelper reportHelper;
     private final UserHelper userHelper;
+    private final PostHelper postHelper;
+    private final ReplyHelper replyHelper;
 
     public Mono<ApiResponse<?>> getReportListIsProcessed(ReportType reportType, String search, Integer size, Integer page, ServerHttpRequest request) {
         Mono<ResponseEntity<ReportResponseDto>> reportProcessed = reportHelper.getReportProcessed(reportType, search, size, page, request.getHeaders());
@@ -51,5 +53,19 @@ public class ReportService {
                         return Mono.just(ApiResponse.of(SuccessCode.SUCCESS, ReportWithBandaysListResponseDto.of(reportWithBandaysResponseList, result.getBody().pageInfo())));
                     });
         });
+    }
+
+    public Mono<ApiResponse<?>> getReportDetail(ReportType reportType, String contentId, ServerHttpRequest request) {
+        if (reportType.equals(ReportType.POST)) {
+            System.out.println(contentId);
+            return postHelper.getPostReportDetail(Long.valueOf(contentId), request.getHeaders())
+                    .flatMap(result -> Mono.just(ApiResponse.of(SuccessCode.SUCCESS, result.getBody())));
+        }
+        return replyHelper.getReply((String) contentId, request.getHeaders())
+                .flatMap(result -> postHelper.getPostReportDetail(result.getBody().postId(), request.getHeaders())
+                        .flatMap(nextResult -> {
+                            ReplyReportDetailResponseDto replyReportDetailResponseDto = ReplyReportDetailResponseDto.of(result.getBody().id(), nextResult.getBody().title(), result.getBody().content());
+                            return Mono.just(ApiResponse.of(SuccessCode.SUCCESS, replyReportDetailResponseDto));
+                        }));
     }
 }

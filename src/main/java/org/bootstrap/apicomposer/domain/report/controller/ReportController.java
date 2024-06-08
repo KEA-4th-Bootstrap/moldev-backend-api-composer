@@ -27,12 +27,10 @@ public class ReportController {
         return reportService.getReportListIsProcessed(reportType, search, size, page, request);
     }
 
-//    @GetMapping("/not-processed")
-//    public Mono<ApiResponse<?>> getReportListIsNotProcessed(@RequestParam(name = "type", required = false) ReportType reportType,
-//                                                         @RequestParam(name = "search", required = false) String search,
-//                                                         @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
-//                                                         @RequestParam(name = "page", required = false, defaultValue = "0") Integer page,
-//                                                         ServerHttpRequest request) {
-//        return reportService.getReportListIsNotProcessed(reportType, search, size, page, request);
-//    }
+    @GetMapping("/detail/{contentId}")
+    public Mono<ApiResponse<?>> getReportDetail(@RequestParam(name = "type") ReportType reportType,
+                                                @PathVariable String contentId,
+                                                ServerHttpRequest request) {
+        return reportService.getReportDetail(reportType, contentId, request);
+    }
 }

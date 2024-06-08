@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.bootstrap.apicomposer.domain.reply.dto.response.CommentCountResponseDto;
 import org.bootstrap.apicomposer.domain.reply.dto.response.CommentDetailListResponseDto;
 import org.bootstrap.apicomposer.domain.reply.dto.response.ReplyDetailListResponseDto;
+import org.bootstrap.apicomposer.domain.reply.dto.response.ReplyResponseDto;
 import org.bootstrap.apicomposer.global.webclient.WebClientUtil;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -38,5 +39,11 @@ public class ReplyHelper {
         return webClientUtil.api(REPLY_SERVICE_URL + "/api/reply/count/" + postId,
                 headers,
                 CommentCountResponseDto.class);
+    }
+
+    public Mono<ResponseEntity<ReplyResponseDto>> getReply(String replyId, HttpHeaders headers) {
+        return webClientUtil.api(REPLY_SERVICE_URL + "/api/reply/report/" + replyId,
+                headers,
+                ReplyResponseDto.class);
     }
 }

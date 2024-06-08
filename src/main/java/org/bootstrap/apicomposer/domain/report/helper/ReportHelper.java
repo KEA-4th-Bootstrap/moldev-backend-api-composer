@@ -35,16 +35,4 @@ public class ReportHelper {
                 headers,
                 ReportResponseDto.class);
     }
-
-    public Mono<ResponseEntity<ReportResponseDto>> getReportNotProcessed(ReportType reportType, String search, Integer size, Integer page, HttpHeaders headers) {
-        return webClientUtil.api(
-                UriComponentsBuilder.fromHttpUrl(REPORT_SERVICE_URL + "/api/report/not-processed")
-                        .queryParam("type", reportType)
-                        .queryParam("search", search)
-                        .queryParam("size", size)
-                        .queryParam("page", page)
-                        .toUriString(),
-                headers,
-                ReportResponseDto.class);
-    }
 }
