@@ -53,15 +53,17 @@ public class UserHelper {
                 TrendingMembersListResponseDto.class);
     }
 
-    public Mono<byte[]> banUser(Long reportId, HttpHeaders headers, Object requestBody) {
-        return webClientUtil.api(MEMBER_SERVICE_URL + "/api/member/ban/" + reportId,
+    public Mono<ResponseEntity<Void>> banUser(Long reportId, HttpHeaders headers, Object requestBody) {
+        return webClientUtil.getApiWithBody(MEMBER_SERVICE_URL + "/api/member/ban/" + reportId,
                 HttpMethod.POST,
+                headers,
                 requestBody,
-                headers);
+                Void.class);
     }
 
     public Mono<ResponseEntity<BanDaysListResponseDto>> getUserBanDaysInfo(Object requestBody, HttpHeaders headers) {
         return webClientUtil.getApiWithBody(MEMBER_SERVICE_URL + "/api/member/banInfoOfReport",
+                HttpMethod.GET,
                 headers,
                 requestBody,
                 BanDaysListResponseDto.class);

@@ -63,9 +63,9 @@ public class WebClientUtil {
                 .retry(2);
     }
 
-    public <T> Mono<ResponseEntity<T>> getApiWithBody(String uri, HttpHeaders headers, Object requestBody, Class<T> responseClass) {
+    public <T> Mono<ResponseEntity<T>> getApiWithBody(String uri, HttpMethod method, HttpHeaders headers, Object requestBody, Class<T> responseClass) {
         return webClientConfig.webClient()
-                .method(HttpMethod.GET)
+                .method(method)
                 .uri(uri)
                 .headers(httpHeaders -> httpHeaders.addAll(headers))
                 .bodyValue(requestBody)

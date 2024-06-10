@@ -57,7 +57,6 @@ public class ReportService {
 
     public Mono<ApiResponse<?>> getReportDetail(ReportType reportType, String contentId, ServerHttpRequest request) {
         if (reportType.equals(ReportType.POST)) {
-            System.out.println(contentId);
             return postHelper.getPostReportDetail(Long.valueOf(contentId), request.getHeaders())
                     .flatMap(result -> Mono.just(ApiResponse.of(SuccessCode.SUCCESS, result.getBody())));
         }
